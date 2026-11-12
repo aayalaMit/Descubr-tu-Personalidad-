@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="es-PY">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Eneagrama: descubrí tu personalidad</title>
+<meta name="author" content="Álvaro Ayala">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --bg:#F5F7FA; --surface:#FFFFFF; --surface-2:#EDF1F6; --ink:#18212F; --muted:#566176; --line:#D6DDE7; --thread:#C9D2DE;
+  --accent:#1E5E48; --accent-ink:#FFFFFF; --accent-soft:#DCEFE6; --warn:#B4233A; --warn-soft:#FBE7EA; --good:#1E7A4F; --good-soft:#E1F3E9;
+  --t1:#C2313D; --t2:#D94C7B; --t3:#E07A1F; --t4:#7447BD; --t5:#2763A8; --t6:#13817F; --t7:#C99A06; --t8:#9C3F24; --t9:#2E8540;
+  --display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1520; --surface:#172030; --surface-2:#1F2A3D; --ink:#E8EDF5; --muted:#A2ADC1; --line:#2C384D; --thread:#334158;
+    --accent:#5CC79C; --accent-ink:#0B1A14; --accent-soft:#163A2D; --warn:#F07A8C; --warn-soft:#3A1C24; --good:#62D29B; --good-soft:#15342A;
+    --t1:#F0626C; --t2:#F27AA3; --t3:#F5A04F; --t4:#A585EB; --t5:#6EA6EE; --t6:#3EC2BE; --t7:#F1C93E; --t8:#E07C5A; --t9:#5FC46F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1520; --surface:#172030; --surface-2:#1F2A3D; --ink:#E8EDF5; --muted:#A2ADC1; --line:#2C384D; --thread:#334158;
+  --accent:#5CC79C; --accent-ink:#0B1A14; --accent-soft:#163A2D; --warn:#F07A8C; --warn-soft:#3A1C24; --good:#62D29B; --good-soft:#15342A;
+  --t1:#F0626C; --t2:#F27AA3; --t3:#F5A04F; --t4:#A585EB; --t5:#6EA6EE; --t6:#3EC2BE; --t7:#F1C93E; --t8:#E07C5A; --t9:#5FC46F;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1.0625rem;line-height:1.6}
+img,svg{max-width:100%}
+button{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+.view{display:none}
+.view.on{display:block}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.1;margin:0;letter-spacing:-0.01em}
+h2{font-size:clamp(1.8rem,3.6vw,2.6rem);font-weight:700}
+h3{font-size:1.3rem;font-weight:700}
+h4{font-size:1.05rem;font-weight:700;margin:1em 0 .35em}
+p{margin:0 0 1em}
+.muted{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;border:0;cursor:pointer;border-radius:999px;padding:.85em 1.5em;font-weight:700;font-size:1.02rem;background:var(--accent);color:var(--accent-ink);transition:transform .15s ease, filter .15s ease}
+.btn:hover{filter:brightness(1.07)}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--line)}
+.btn.small{padding:.5em 1em;font-size:.92rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 0;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:1.1rem;color:var(--ink);background:none;border:0;cursor:pointer;padding:0}
+.brand svg{width:30px;height:30px}
+.top-actions{display:flex;gap:8px;align-items:center}
+.theme-toggle{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:.4em .9em;cursor:pointer;font-size:.9rem}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(24px,5vw,64px);align-items:center;padding:clamp(12px,4vw,40px) 0 clamp(40px,6vw,72px)}
+.hero h1{font-size:clamp(3rem,7.6vw,6.2rem);font-weight:800;letter-spacing:-0.04em;line-height:.98;font-variation-settings:"opsz" 96}
+.hero .sub{font-family:var(--display);font-size:clamp(1.25rem,2.4vw,1.7rem);font-weight:500;margin:.8em 0 .8em;line-height:1.25}
+.hero .lead{max-width:34em;color:var(--muted)}
+.hero-form{display:flex;flex-wrap:wrap;gap:12px;margin-top:1.4em;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:4px;flex:1 1 220px;max-width:320px}
+.field label{font-size:.88rem;color:var(--muted)}
+.field input{font:inherit;padding:.75em 1em;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+.field input:focus{border-color:var(--accent);outline:none}
+.resume-note{margin-top:1em;font-size:.95rem;padding:.8em 1em;border-radius:14px;background:var(--accent-soft);display:none}
+.resume-note.on{display:block}
+.hero-art svg{display:block;width:100%;height:auto}
+.quote{font-family:var(--display);font-size:1.05rem;color:var(--muted);margin-top:1.2em;max-width:32em;line-height:1.35}
+
+/* ñandutí */
+.nd-thread{stroke:var(--thread);fill:none}
+.nd-line{stroke:var(--ink);stroke-opacity:.55;fill:none;stroke-width:1.6}
+.nd-pt circle.dot{stroke:var(--surface);stroke-width:3}
+.nd-pt text{font-family:var(--display);font-weight:800;fill:#fff;font-size:17px;pointer-events:none}
+.nd-pt{cursor:pointer}
+.nd-pt.dim{opacity:.25}
+.nd-pt .ring{fill:none;stroke-width:3;opacity:0}
+.nd-pt.sel .ring{opacity:1}
+.nd-label{font-family:var(--body);font-size:12px;fill:var(--muted)}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 2.4s cubic-bezier(.6,.1,.2,1) forwards}
+.draw.d2{animation-delay:.5s}
+.pop{opacity:0;animation:pop .5s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pop{to{opacity:1}}
+@media (prefers-reduced-motion: reduce){
+  .draw{animation:none;stroke-dashoffset:0}
+  .pop{animation:none;opacity:1}
+  .btn,.opt{transition:none}
+}
+
+/* Sections */
+.section{padding:clamp(40px,6vw,76px) 0;border-top:1px solid var(--line)}
+.section-head{max-width:42em;margin-bottom:1.6em}
+.section-head p{color:var(--muted);margin-top:.6em}
+.explorer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(20px,4vw,48px);align-items:start}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.35em .9em;cursor:pointer;font-size:.92rem}
+.chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.type-panel{background:var(--surface);border-radius:22px;padding:clamp(20px,3vw,32px);border-left:8px solid var(--tc,var(--accent))}
+.type-panel .num{font-family:var(--display);font-weight:800;font-size:4.5rem;line-height:.9;color:var(--tc)}
+.lema{font-family:var(--display);font-size:1.2rem;margin:.4em 0 .8em}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:.35em 1em;margin:1em 0;font-size:.98rem}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:700}
+
+.timeline{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.timeline li{border-top:4px solid var(--ink);padding-top:14px}
+.timeline .when{font-family:var(--display);font-weight:800;font-size:1.6rem;display:block;margin-bottom:.2em}
+.timeline p{font-size:.97rem;color:var(--muted);margin:0}
+.timeline li:nth-child(2){border-color:var(--t5)}
+.timeline li:nth-child(3){border-color:var(--t9)}
+.timeline li:nth-child(4){border-color:var(--t2)}
+
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding-left:3.2em}
+.steps li::before{content:counter(s);position:absolute;left:0;top:-.1em;font-family:var(--display);font-weight:800;font-size:2.2rem;line-height:1;color:var(--accent)}
+.steps h3{margin-bottom:.3em}
+.steps p{color:var(--muted);font-size:.98rem;margin:0}
+
+/* Accordions */
+.acc-tools{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.acc{background:var(--surface);border-radius:16px;margin-bottom:10px;border:1px solid var(--line);overflow:hidden}
+.acc>summary{list-style:none;cursor:pointer;padding:16px 52px 16px 20px;position:relative;font-family:var(--display);font-weight:700;font-size:1.12rem;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.acc>summary::-webkit-details-marker{display:none}
+.acc>summary::after{content:"";position:absolute;right:22px;top:50%;width:11px;height:11px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:translateY(-70%) rotate(45deg);transition:transform .2s ease}
+.acc[open]>summary::after{transform:translateY(-30%) rotate(-135deg)}
+.acc>summary .hint{font-family:var(--body);font-weight:400;font-size:.92rem;color:var(--muted)}
+.acc>summary:hover{background:var(--surface-2)}
+.acc .acc-body{padding:4px 20px 20px;max-width:52em}
+.acc .acc-body ul,.acc .acc-body ol{padding-left:1.2em;margin:.3em 0 1em}
+.acc .acc-body li{margin-bottom:.4em}
+.acc.tinted{border-left:6px solid var(--tc,var(--accent))}
+
+.lvl3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:.6em 0 1em}
+.lvl3 div{border-radius:14px;padding:14px 16px;font-size:.96rem}
+.lvl3 b{display:block;font-family:var(--display);font-size:1.05rem;margin-bottom:.3em}
+.lvl3 .s{background:var(--good-soft)}
+.lvl3 .m{background:var(--surface-2)}
+.lvl3 .u{background:var(--warn-soft)}
+.ladder3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:.4em}
+.ladder3>div>b{font-family:var(--display);display:block;margin-bottom:.3em}
+.ladder{list-style:none;padding:0!important;margin:0!important;display:grid;gap:6px}
+.ladder li{font-size:.92rem;display:flex;gap:8px;align-items:baseline;margin:0!important}
+.ladder li span{font-family:var(--display);font-weight:800;min-width:1.3em;color:var(--muted)}
+.comgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.comgrid div{background:var(--surface-2);border-radius:14px;padding:14px 16px;font-size:.96rem}
+.comgrid div:first-child{grid-column:1/-1}
+.comgrid b{display:block;font-family:var(--display);margin-bottom:.25em}
+.manif{display:grid;gap:8px;margin-top:.6em}
+.manif div{border-left:4px solid var(--warn);padding:4px 0 4px 12px;font-size:.96rem}
+.manif b{display:block}
+.dir2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dircard{border-radius:16px;padding:16px 18px;font-size:.96rem}
+.dircard.g{background:var(--good-soft);border-top:5px solid var(--good)}
+.dircard.r{background:var(--warn-soft);border-top:5px solid var(--warn)}
+.dircard h4{margin-top:0;font-size:1.1rem}
+.dircard .target{display:flex;align-items:center;gap:10px;margin:.6em 0;padding:10px 12px;background:var(--surface);border-radius:12px}
+.badge{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font-family:var(--display);font-weight:800;flex:none}
+.wings{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wings div{border-radius:14px;padding:14px 16px;background:var(--surface-2);font-size:.96rem;border:2px solid transparent}
+.wings div.yours{border-color:var(--ink)}
+.recs{counter-reset:r;list-style:none;padding:0!important}
+.recs li{counter-increment:r;position:relative;padding-left:2.4em;margin-bottom:.7em!important}
+.recs li::before{content:counter(r);position:absolute;left:0;top:0;width:1.7em;height:1.7em;border-radius:50%;background:var(--tc,var(--accent));color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:.85rem}
+
+.tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--line);margin:.6em 0 1em}
+table.tbl{border-collapse:collapse;width:100%;font-size:.93rem;min-width:620px;background:var(--surface)}
+.tbl th,.tbl td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font-family:var(--display);background:var(--surface-2)}
+.tbl tr.hl td{background:var(--accent-soft)}
+.tbl .n{font-family:var(--display);font-weight:800;color:#fff;border-radius:50%;width:26px;height:26px;display:inline-grid;place-items:center}
+
+/* Type detail */
+.td-head{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;margin:8px 0 16px}
+.td-num{font-family:var(--display);font-weight:800;font-size:5rem;line-height:.85;color:var(--tc)}
+.td-head h3{font-size:clamp(1.6rem,3vw,2.2rem)}
+.td-head .alias{color:var(--muted);font-size:.95rem}
+.type-switch{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.type-switch button{width:40px;height:40px;border-radius:50%;border:3px solid transparent;cursor:pointer;color:#fff;font-family:var(--display);font-weight:800}
+.type-switch button[aria-pressed="true"]{border-color:var(--ink)}
+.td-note{font-size:.92rem;color:var(--muted);margin:-6px 0 12px}
+
+.history{display:grid;gap:10px}
+.hist-item{display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:var(--surface);border-radius:16px;padding:12px 16px}
+.hist-badge{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;color:#fff;font-size:1.3rem;flex:none}
+.hist-meta{flex:1 1 180px;min-width:0}
+.hist-meta strong{display:block}
+.hist-meta span{color:var(--muted);font-size:.9rem}
+.hist-actions{display:flex;gap:8px;flex-wrap:wrap}
+.empty{color:var(--muted);font-style:italic}
+
+/* Test */
+.test-shell{max-width:860px;margin:0 auto;padding:8px 0 60px}
+.test-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.counter{font-family:var(--display);font-weight:700;font-size:1.05rem}
+.counter span{color:var(--muted);font-weight:500}
+.progress{height:12px;border-radius:999px;background:var(--surface-2);overflow:hidden;display:flex}
+.progress i{display:block;height:100%;flex:1 1 0;position:relative;overflow:hidden}
+.progress i b{position:absolute;inset:0;width:0;transition:width .25s ease}
+.test-intro{color:var(--muted);margin:1.4em 0 .4em;font-size:.98rem}
+.q-title{font-family:var(--display);font-size:clamp(1.3rem,2.6vw,1.75rem);font-weight:600;margin:.2em 0 1em}
+.q-title:focus{outline:none}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.opt{position:relative;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:26px 24px 26px 64px;cursor:pointer;font-size:1.12rem;line-height:1.45;min-height:150px;transition:border-color .15s ease, background .15s ease}
+.opt:hover{border-color:var(--ink)}
+.opt .key{position:absolute;left:20px;top:24px;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-family:var(--display);font-weight:800;background:var(--surface-2);font-size:.95rem}
+.opt.chosen{border-color:var(--accent);background:var(--accent-soft)}
+.opt.chosen .key{background:var(--accent);color:var(--accent-ink)}
+.test-nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:12px;flex-wrap:wrap}
+.kbd-hint{font-size:.88rem;color:var(--muted)}
+kbd{font-family:var(--body);background:var(--surface-2);border-radius:5px;padding:0 .4em;border:1px solid var(--line)}
+.test-help{margin-top:28px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;background:var(--ink);color:var(--bg);padding:14px 22px;border-radius:16px;max-width:min(92vw,520px);text-align:center;font-weight:700;transition:all .35s ease;z-index:40;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* Result */
+.res-hero{display:grid;grid-template-columns:auto 1fr;gap:clamp(16px,3vw,36px);align-items:center;padding:24px 0 28px}
+.res-num{font-family:var(--display);font-weight:800;font-size:clamp(7rem,18vw,12rem);line-height:.8;color:var(--tc);letter-spacing:-.05em}
+.res-hero .who{color:var(--muted);font-size:1.05rem;margin-bottom:.2em}
+.res-hero h1{font-size:clamp(2.2rem,5.5vw,3.8rem);font-weight:800}
+.res-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:1em}
+.pill{background:var(--surface);border-radius:999px;padding:.35em .95em;font-size:.95rem;border:1px solid var(--line)}
+.res-actions{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 24px}
+.note{background:var(--surface);border-radius:16px;padding:14px 18px;font-size:.96rem;color:var(--muted);margin-bottom:24px;border-left:4px solid var(--t7)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+.card{background:var(--surface);border-radius:22px;padding:clamp(18px,3vw,28px)}
+.card>h3{margin-bottom:.6em}
+.chart-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
+.chart-controls select{font:inherit;padding:.35em .7em;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);max-width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.88rem;color:var(--muted);margin-top:8px}
+.legend span::before{content:"";display:inline-block;width:22px;height:0;border-top:3px solid currentColor;vertical-align:middle;margin-right:6px}
+.legend .lg-grow{color:var(--good)}
+.legend .lg-stress{color:var(--warn)}
+.legend .lg-cmp::before{border-top-style:dashed}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:34px 1fr 52px;align-items:center;gap:10px;background:none;border:0;padding:4px 0;cursor:pointer;text-align:left;border-radius:8px}
+.bar .bn{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:800}
+.bar .track{height:22px;background:var(--surface-2);border-radius:6px;position:relative;overflow:hidden}
+.bar .fill{position:absolute;inset:0 auto 0 0;border-radius:6px;transition:width .6s cubic-bezier(.3,.7,.3,1)}
+.bar .nm{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.85rem;font-weight:700;color:var(--ink);white-space:nowrap}
+.bar .sc{font-family:var(--display);font-weight:700;text-align:right}
+.triads{display:grid;gap:14px}
+.triad .row{display:flex;justify-content:space-between;font-weight:700;gap:8px;flex-wrap:wrap}
+.triad .row span{color:var(--muted);font-weight:400}
+.triad .track{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:6px}
+.triad .track b{display:block;height:100%;background:var(--ink);border-radius:99px}
+.triad p{font-size:.92rem;color:var(--muted);margin:.4em 0 0}
+.path{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0 4px}
+.path button{text-align:left;background:var(--surface-2);border:2px solid transparent;border-radius:16px;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.path button:hover{border-color:var(--ink)}
+.path .lbl{font-size:.88rem;color:var(--muted)}
+.path .ttl{font-family:var(--display);font-weight:700;display:flex;align-items:center;gap:8px}
+.path .what{font-size:.86rem;color:var(--muted)}
+
+/* Credits */
+.credits{padding:clamp(40px,6vw,70px) 0 50px;border-top:1px solid var(--line);font-size:.96rem}
+.credits-grid{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:28px}
+.credits h3{font-size:1.05rem;margin-bottom:.6em}
+.credits ul{list-style:none;padding:0;margin:0}
+.credits li{margin-bottom:.55em;color:var(--muted)}
+.credits li strong{color:var(--ink)}
+.author{font-family:var(--display);font-size:1.6rem;font-weight:700;margin:.1em 0 .3em}
+.disclaimer{margin-top:28px;font-size:.88rem;color:var(--muted);max-width:60em}
+
+@media (max-width: 880px){
+  .hero{grid-template-columns:1fr}
+  .hero-art{max-width:420px;margin:0 auto;order:-1;width:80%}
+  .explorer,.grid2,.dir2{grid-template-columns:1fr}
+  .timeline{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr}
+  .credits-grid{grid-template-columns:1fr}
+  .lvl3{grid-template-columns:1fr}
+  .path{grid-template-columns:1fr 1fr}
+}
+@media (max-width: 620px){
+  .opts,.comgrid,.wings,.ladder3{grid-template-columns:1fr}
+  .opt{min-height:0;padding:20px 18px 20px 58px;font-size:1.05rem}
+  .opt .key{left:16px;top:20px}
+  .timeline{grid-template-columns:1fr}
+  .res-hero{grid-template-columns:1fr}
+  .kbd-hint{display:none}
+  .path{grid-template-columns:1fr}
+  .td-num{font-size:3.8rem}
+}
+@media print{
+  .topbar,.res-actions,.chart-controls,.type-switch,.acc-tools,.theme-toggle{display:none!important}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <button class="brand" id="homeLink" aria-label="Ir al inicio">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M20 3 L34.7 28.5 L5.3 28.5 Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      Eneagrama
+    </button>
+    <div class="top-actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Cambiar entre modo claro y oscuro">Modo oscuro</button>
+    </div>
+  </header>
+</div>
+
+<!-- ================= INICIO ================= -->
+<main id="view-home" class="view on">
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <h1>Descubrí tu personalidad</h1>
+        <p class="sub">Un viaje de autoconocimiento con el eneagrama de los nueve tipos.</p>
+        <p class="lead">144 pares de frases y unos 25 minutos. Al final ves tu tipo básico, tu ala, tus direcciones de integración y desintegración, tu estilo de comunicación, tu virtud y tu pecado capital. Tu avance se guarda solo y podés descargar tu informe en PDF.</p>
+        <div class="hero-form">
+          <div class="field">
+            <label for="nameInput">¿Cómo te llamás? (opcional, aparece en tu informe)</label>
+            <input id="nameInput" type="text" maxlength="60" autocomplete="given-name" placeholder="Tu nombre">
+          </div>
+          <button class="btn" id="startBtn">Empezar el test</button>
+        </div>
+        <div class="resume-note" id="resumeNote">
+          Tenés un test a medias (<span id="resumeCount">0</span> de 144 respondidas).
+          <button class="btn small" id="resumeBtn" style="margin-left:6px">Seguir donde quedé</button>
+        </div>
+        <p class="quote">La personalidad es como un traje psicológico, mental y emocional. Tomá conciencia de él: tenés el poder de transformarlo en su expresión más hermosa.</p>
+      </div>
+      <div class="hero-art">
+        <svg id="heroSvg" viewBox="0 0 400 400" role="img" aria-label="Eneagrama dibujado como un encaje de ñandutí con los nueve tipos"></svg>
+      </div>
+    </section>
+
+    <section class="section" id="explorar">
+      <div class="section-head">
+        <h2>Nueve formas de mirar el mundo</h2>
+        <p>Tocá cada punto para conocer el tipo, o filtrá por tríada. Ningún tipo es mejor que otro: el ideal es llegar a ser la mejor versión de uno mismo, no envidiar las fortalezas de los demás.</p>
+      </div>
+      <div class="explorer">
+        <div>
+          <div class="chip-row" role="group" aria-label="Filtrar por tríada" id="triadFilter">
+            <button class="chip" data-triad="all" aria-pressed="true">Todas</button>
+            <button class="chip" data-triad="sentir" aria-pressed="false">Sentir: 2, 3, 4</button>
+            <button class="chip" data-triad="hacer" aria-pressed="false">Hacer: 5, 6, 7</button>
+            <button class="chip" data-triad="relacionarse" aria-pressed="false">Relacionarse: 8, 9, 1</button>
+          </div>
+          <svg id="exploreSvg" viewBox="0 0 400 400" role="group" aria-label="Eneagrama interactivo"></svg>
+          <p class="muted" id="triadText" style="font-size:.95rem"></p>
+        </div>
+        <div id="explorePanel" class="type-panel" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section" id="aprender">
+      <div class="section-head">
+        <h2>Aprendé el eneagrama</h2>
+        <p>Todo lo que necesitás para leer tu resultado. Abrí y cerrá cada tema.</p>
+      </div>
+      <div class="acc-tools"><button class="btn ghost small" data-acc-all="open" data-acc-scope="#learnAcc">Expandir todo</button><button class="btn ghost small" data-acc-all="close" data-acc-scope="#learnAcc">Contraer todo</button></div>
+      <div id="learnAcc"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Un mapa con raíces sudamericanas</h2>
+        <p>El símbolo es antiguo, pero el eneagrama de la personalidad tomó forma en Bolivia y Chile antes de llegar al resto del mundo.</p>
+      </div>
+      <ol class="timeline">
+        <li><span class="when">1910s</span><p>G. I. Gurdjieff difunde en Occidente el símbolo del eneagrama, todavía sin relación con tipos de personalidad.</p></li>
+        <li><span class="when">1968</span><p>El boliviano Óscar Ichazo, formado en Bolivia y Perú, funda la Escuela Arica en Chile y asocia el símbolo con nueve fijaciones del ego.</p></li>
+        <li><span class="when">1970</span><p>El psiquiatra chileno Claudio Naranjo estudia con Ichazo y desarrolla los eneatipos desde la psicología. En 1971 el sistema se presenta en la Universidad Loyola de Chicago.</p></li>
+        <li><span class="when">1987</span><p>Don Richard Riso publica <em>Tipos de personalidad</em>; luego, con Russ Hudson, crea el test RHETI en el que se basa esta herramienta.</p></li>
+      </ol>
+    </section>
+
+    <section class="section" id="biblioteca">
+      <div class="section-head">
+        <h2>Los nueve tipos en profundidad</h2>
+        <p>La ficha completa de cada tipo, con todo el contenido de la guía original: tríada, niveles, comunicación, virtud, vicio, pasión, integración, alas y recomendaciones.</p>
+      </div>
+      <div id="libraryDetail" class="card"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Cómo funciona</h2></div>
+      <ol class="steps">
+        <li><h3>Elegí entre dos frases</h3><p>Pensá en cómo fuiste la mayor parte de tu vida, no solo esta semana. Si te quedan las dos, elegí la que más.</p></li>
+        <li><h3>Mirá tu mapa</h3><p>Ves tu puntaje en los nueve tipos y el recorrido de lectura recomendado: tipo básico, ala, integración y desintegración.</p></li>
+        <li><h3>Guardá tu informe</h3><p>Cada resultado queda guardado en este dispositivo y se puede descargar en PDF para compartir o comparar con otra vez.</p></li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Tus resultados guardados</h2>
+        <p>Se guardan solo en este navegador. Hacé el test de nuevo dentro de unos meses y compará.</p>
+      </div>
+      <div class="history" id="homeHistory"></div>
+    </section>
+  </div>
+</main>
+
+<!-- ================= TEST ================= -->
+<main id="view-test" class="view">
+  <div class="wrap">
+    <div class="test-shell">
+      <div class="test-top">
+        <div class="counter" id="counter">Pregunta 1 <span>de 144</span></div>
+        <button class="btn ghost small" id="pauseBtn">Pausar y salir</button>
+      </div>
+      <div class="progress" id="progress" aria-hidden="true"></div>
+      <p class="test-intro">¿Cuál de estas dos frases te describe mejor?</p>
+      <h2 class="q-title" id="qTitle" tabindex="-1">Elegí una</h2>
+      <div class="opts" role="group" aria-labelledby="qTitle">
+        <button class="opt" id="optA"><span class="key">1</span><span class="txt"></span></button>
+        <button class="opt" id="optB"><span class="key">2</span><span class="txt"></span></button>
+      </div>
+      <div class="test-nav">
+        <button class="btn ghost small" id="backBtn">Anterior</button>
+        <span class="kbd-hint">Atajos: <kbd>1</kbd> o <kbd>←</kbd>, <kbd>2</kbd> o <kbd>→</kbd>, <kbd>Retroceso</kbd> para volver</span>
+        <button class="btn small" id="finishBtn" style="display:none">Ver mi resultado</button>
+      </div>
+      <details class="acc test-help">
+        <summary>Cómo responder <span class="hint">los cuatro “yo”</span></summary>
+        <div class="acc-body">
+          <p>Respondé según cómo realmente reaccionás, pensás, hacés y sentís, no según cómo te gustaría ser. Todas las preguntas tienen que responderse.</p>
+          <p>En cierto sentido tenemos cuatro “yo”: el yo pasado, el yo presente, el yo ideal y el yo que los demás ven. Si pasaste por un proceso terapéutico o espiritual es normal haber cambiado, pero lo esencial se mantiene, porque el tipo básico no cambia. Elegí las frases que más tuvieron que ver con la mayor parte de tu vida.</p>
+          <p class="muted">El test es solo una orientación. La certeza llega después, observándote con honestidad y comparando tu forma de ser con la descripción de cada tipo.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</main>
+
+<!-- ================= RESULTADO ================= -->
+<main id="view-result" class="view">
+  <div class="wrap">
+    <section class="res-hero" id="resHero"></section>
+    <div class="res-actions">
+      <button class="btn" id="pdfBtn">Descargar informe PDF</button>
+      <button class="btn ghost" id="retakeBtn">Hacer el test otra vez</button>
+      <button class="btn ghost" id="toHomeBtn">Volver al inicio</button>
+    </div>
+    <p class="note">El test orienta, vos confirmás. La barra más alta define tu tipo básico; de sus dos vecinas en el círculo, la más alta es tu ala. Leé también tus dos o tres tipos con más puntaje y quedate con el que más te resuene.</p>
+
+    <section class="card" style="margin-bottom:24px">
+      <h3>Tu recorrido de lectura</h3>
+      <p class="muted" style="font-size:.95rem;margin-bottom:0">Nadie es un tipo puro. Tu personalidad es una mezcla de cuatro tipos: el básico, el ala, y los que marcan tus direcciones de integración y desintegración. Tocá cada uno para leerlo.</p>
+      <div class="path" id="pathCards"></div>
+    </section>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>Tu ñandutí</h3>
+        <div class="chart-controls">
+          <button class="chip" id="tgArrows" aria-pressed="true">Integración y desintegración</button>
+          <label class="muted" for="cmpSelect" style="font-size:.9rem">Comparar con</label>
+          <select id="cmpSelect"><option value="">Ninguno</option></select>
+        </div>
+        <svg id="resultSvg" viewBox="0 0 400 400" role="img" aria-label="Gráfico de tus puntajes sobre el eneagrama"></svg>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="card">
+        <h3>Puntaje en los nueve tipos</h3>
+        <p class="muted" style="font-size:.92rem;margin-top:-.3em">Máximo posible por tipo: 32. Tocá un tipo para leer su ficha.</p>
+        <div class="bars" id="bars"></div>
+        <h3 style="margin-top:1.4em">Tus tríadas</h3>
+        <div class="triads" id="triads"></div>
+      </div>
+    </div>
+
+    <section class="card" style="margin-top:24px" id="detailCard"></section>
+
+    <section style="margin-top:36px">
+      <h3 style="margin-bottom:.8em">Todas tus versiones</h3>
+      <div class="history" id="resHistory"></div>
+    </section>
+  </div>
+</main>
+
+<div class="wrap">
+  <footer class="credits" id="credits">
+    <div class="credits-grid">
+      <div>
+        <h3>Herramienta digital y adaptación al contexto paraguayo</h3>
+        <p class="author">Álvaro Ayala</p>
+        <p class="muted">Asunción, Paraguay, 2026. Versión web interactiva de la guía en planilla “ENEAGRAMA: Descubre tu personalidad”, con preguntas y descripciones reescritas en español paraguayo.</p>
+      </div>
+      <div>
+        <h3>Creadores y fuentes del método</h3>
+        <ul>
+          <li><strong>Don Richard Riso y Russ Hudson</strong>, The Enneagram Institute: test RHETI, tríadas, niveles de desarrollo, direcciones de integración y recomendaciones. Test oficial en enneagraminstitute.com.</li>
+          <li><strong>Óscar Ichazo</strong> (Bolivia, 1931–2020), fundador de la Escuela Arica.</li>
+          <li><strong>Claudio Naranjo</strong> (Valparaíso, 1932–2019), creador de los eneatipos y de la teoría de las pasiones.</li>
+          <li><strong>Alfonso Colodrón</strong>, terapeuta gestáltico, autor de los artículos sobre pasiones capitales citados en la guía.</li>
+          <li><strong>Guía original en planilla</strong>: autor anónimo (2006), de libre distribución. Sus secciones de vicios y virtudes siguen la línea de autores como Arnaldo Pangrazzi, y citan a Richard Rohr y Helen Palmer.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Bibliografía</h3>
+        <ul>
+          <li>Riso, D. R. <em>Tipos de personalidad</em>; <em>Comprendiendo el eneagrama</em>; <em>Descubre el perfil de tu personalidad</em>. Cuatro Vientos.</li>
+          <li>Riso, D. R. y Hudson, R. <em>La sabiduría del eneagrama</em>. Urano, 2001.</li>
+          <li>Naranjo, C. <em>Carácter y neurosis</em> (1996); <em>El eneagrama de la sociedad</em> (1995); <em>Autoconocimiento transformador</em>.</li>
+          <li>Palmer, H. <em>El eneagrama</em> (1996). Daniels, D. y Price, V. <em>Eneagrama esencial</em> (2002). Goldberg, M. <em>Eneagrama: las nueve formas de trabajar</em> (2000). Gallen, M.-A. y Neidhardt, H. <em>El eneagrama de nuestras relaciones</em> (1997).</li>
+          <li>Melià, B. sobre el <em>jopói</em> y la economía de reciprocidad guaraní.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="disclaimer">Esta herramienta es para el autoconocimiento y el desarrollo personal o de equipos. No es un diagnóstico psicológico y la evidencia científica sobre el eneagrama es todavía limitada. Las frases del test y las descripciones fueron reescritas y adaptadas, por lo que los resultados pueden diferir de la versión oficial RHETI. Tus respuestas se guardan solo en tu navegador.</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const AUTHOR = "Álvaro Ayala";
+const TYPES = {
+1:{name:"El Reformador",alias:"también llamado el Perfeccionista",lema:"Hacerlo bien, aunque cueste.",
+ rasgos:"De principios, idealista, ordenado y perfeccionista; en su peor versión, castigador.",
+ triada:"relacionarse",triadaPos:"Relacionarse subdesarrollado",
+ intro:"Dentro de la tríada del Relacionarse, el 1 es quien menos desarrolló su capacidad de vincularse con el entorno tal como es. Necesita sentirse justificado antes de actuar y cree que primero tiene que ser perfecto para permitirse hacer o querer lo que de verdad desea. Ve el mundo, y se ve a sí mismo, lejos del ideal; por eso vive insatisfecho y, cuando se descuida, se vuelve irritable e intolerante si las cosas no se ajustan a cómo “deberían ser”.",
+ deseo:"Ser íntegro, correcto y coherente.",miedo:"Ser malo, corrupto o equivocarse.",
+ sano:"Es concienzudo, con un sentido profundo del bien y del mal. Racional, sensato, disciplinado y moderado; la verdad y la justicia son sus valores centrales. En su mejor momento es sabio y tolerante: sabe qué es lo correcto en cada situación, aconseja con prudencia y enseña con el ejemplo.",
+ promedio:"Siente que le toca a él arreglar todo. Se vuelve ordenado, puntual, metódico y detallista, pero también rígido, serio y contenido con sus emociones. Piensa en blanco o negro, corrige a los demás, se impacienta y critica. Trabaja de más y nunca queda conforme con nada que no sea perfecto.",
+ malsano:"Se vuelve dogmático e inflexible: solo él tiene la verdad. Juzga con dureza, se obsesiona con los errores ajenos y, sin darse cuenta, puede hacer lo mismo que condena mientras lo justifica. En el extremo, se vuelve cruel y castigador con quien no actúa como él dice.",
+ niveles:["Sabio y tolerante","Razonable y objetivo","Íntegro y responsable","Idealista que se exige","Ordenado y controlado","Crítico y sermoneador","Inflexible y farisaico","Obsesivo y contradictorio","Castigador y condenatorio"],
+ com:{verbal:"Juzga la conducta más que las intenciones y tiende a moralizar: “¿Viste? Te dije”, “hay que”, “habría que”, “todos deberíamos”. Su tono puede ser tajante o culpabilizador. Repite instrucciones para asegurarse de que nadie se equivoque.",
+  gestos:"Le cuesta relajarse. Mantiene el cuerpo erguido y tenso, como listo para actuar.",
+  espacio:"Cada cosa en su lugar: carpetas, zapatos, ropa. Su entorno refleja limpieza y orden, aunque casi siempre tiene un rincón desordenado que solo él entiende.",
+  tiempo:"El tiempo es valioso y no se derrocha: horarios y plazos se cumplen. Suele estresarse porque nunca le alcanza para hacer todo bien.",
+  vestido:"Cuida mucho su imagen: ropa combinada, prolija, de colores clásicos."},
+ virtud:{nombre:"La serenidad",practicas:["Reconocer lo bueno que ya hay en vos y en los demás, sin atormentarte por lo que falta.","Aceptar que hay muchas formas correctas de hacer las cosas, no solo la tuya.","Transformar el enojo en energía al servicio de la justicia, sin juzgarlo ni justificarlo.","Tener paciencia y valorar los pequeños avances, sin lamentar errores pasados.","Aprender a reírte de vos mismo y bajarle el drama a tus equivocaciones.","Dar a cada cosa su justa medida: no hacer una montaña de un grano de arena.","Recordar que la salvación del mundo no depende solo de tu esfuerzo.","Convivir con creatividad con tus propias limitaciones."]},
+ vicio:{nombre:"La ira",desc:"Su pecado capital es la ira en todas sus formas: irritación, frustración, resentimiento, impaciencia, intolerancia. Como se exige tanto, sufre enseguida la distancia entre el ideal y la realidad. Aprieta los dientes para disimular el enojo porque cree que una persona educada no se enoja, y ese enojo contenido se nota en la tensión de la cara y en el tono de voz. Es como una olla a presión.",
+  manif:[["Superioridad","La irritación por las limitaciones ajenas se vuelve aire de superioridad moral, intelectual o profesional."],["Hipercrítica","Detecta al instante los errores y lo que no funciona, en los demás y en sí mismo."],["Perfeccionismo","Exceso de atención a los detalles y a las normas, con impaciencia ante lo “mediocre”."],["Moralismo","Impone su criterio con tono de sermón y suele terminar culpabilizando."],["Sobrecontrol","Rigidez y falta de espontaneidad; la tensión le afecta el sueño, la digestión y la salud."]]},
+ pasion:{nombre:"La ira",texto:"Según Claudio Naranjo y el terapeuta Alfonso Colodrón, es la persona justiciera cuyos modales correctos esconden una ira reprimida por el tabú de la violencia. Su arma es la crítica, a los demás y a sí misma. De chicos solían ser “niños buenos” que se tragaban la rebeldía para ganarse cariño y aprobación, al precio de renunciar a su espontaneidad y al disfrute. Hay perfeccionistas que se exigen todo, perfeccionadores que nunca quedan conformes con lo que hacen los demás, y los “perfectos”, que proyectan: en lugar de decir “yo quiero”, dicen “vos tenés que”. El placer por el placer les resulta tan prohibido como expresar el enojo.",
+  camino:"Cambiar las obligaciones autoimpuestas por prioridades reales, cuestionar las normas internas, aceptar que lo mejor es enemigo de lo bueno, abrirse a los valores de otros, distinguir entre el “debería” y el deseo, y vivir la vida como celebración y no como tarea."},
+ crece:7,crecTxt:"Se relaja y descubre que la vida no tiene que ser siempre seria. Pasa de la obligación al entusiasmo y de la represión a la libertad. Puede disfrutar de lo bueno sin sentirse obligado a mejorarlo: las cosas no tienen que ser perfectas para ser buenas. Se vuelve más flexible sin renunciar a sus valores, más juguetón, más espontáneo y mucho más feliz.",
+ estres:4,estrTxt:"Se siente incomprendido y solo en su lucha por hacer las cosas bien. Cae en la melancolía, la autocompasión y el resentimiento, y puede llegar a deprimirse sintiendo que nadie valora su esfuerzo.",
+ alas:{9:"Más sereno, idealista e impersonal; más reservado y con menos necesidad de convencer a otros.",2:"Más cálido, servicial y persuasivo; quiere mejorar el mundo ayudando a las personas, aunque también puede ser más controlador."},
+ trabajo:"Es quien revisa dos veces el informe y encuentra el error que nadie vio. Aporta procesos claros, calidad y coherencia. Rinde mejor con reglas claras y cuando siente que su trabajo mejora algo real.",
+ familia:"En casa cuida que se cumplan los acuerdos y que cada cosa esté en su lugar. Su cariño se nota en la responsabilidad: si dijo que viene, viene. En la ronda de tereré suele ser quien pone orden en la charla.",
+ recs:["Aprendé a relajarte. Date tiempo para vos sin sentir que todo depende de vos o que, si algo queda sin hacer, todo se derrumba.","Tenés mucho para enseñar, pero no esperes que los demás cambien de inmediato. Lo que es obvio para vos no lo es para todos; tu ejemplo ayuda más de lo que creés, aunque tarde.","Antes de enojarte con los errores ajenos, mirá los tuyos: sacá la viga de tu ojo antes de ver la paja en el ajeno.","Conectá con tus emociones e impulsos. Escribir un diario o participar en un grupo te puede mostrar que nadie te condena por tener necesidades humanas.","Tu talón de Aquiles es la indignación. Notá cuando hacés de juez y jurado; ese enojo constante también afecta tu salud.","Dejá que la gente sea como es y tome sus propias decisiones. Saber cuándo y cuánto decir es parte de la sabiduría.","Escuchá: muchas veces los demás también tienen razón, o al menos una parte de verdad.","No existe una única forma correcta de lavar los platos o planchar una camisa. Distinguí cuándo la perfección importa y cuándo es una exigencia inútil.","Frená a tiempo los pensamientos obsesivos y las conductas compulsivas. El deseo de controlar todo tu entorno suele esconder el miedo a perder el control en otra parte de tu vida.","No hace falta ser perfecto para ser bueno. Date la satisfacción de ser humano."]},
+
+2:{name:"El Ayudador",alias:"también llamado el Servicial",lema:"Si vos estás bien, yo estoy bien.",
+ rasgos:"Cariñoso, atento, servicial y generoso; en su peor versión, posesivo y manipulador.",
+ triada:"sentir",triadaPos:"Sentir sobredesarrollado",
+ intro:"Es el tipo de la tríada del Sentir que expresa sus sentimientos en exceso. Demuestra abiertamente su amor y su afecto, pero no se da cuenta del resentimiento que guarda hacia quienes no le agradecen lo que hace. Se ve a sí mismo como amoroso y considerado, y lo es cuando está sano; al deteriorarse, su conducta empieza a contradecir esa imagen.",
+ deseo:"Sentirse querido y necesario.",miedo:"No ser digno de amor.",
+ sano:"Es empático, compasivo y muy sensible a lo que les pasa a los demás. Sincero, afectuoso y alentador, ve lo bueno en otros aunque ellos no lo vean. Es generoso y da a la gente lo que de verdad necesita. En su mejor momento ama sin condiciones y sin esperar nada a cambio.",
+ promedio:"Empieza a hablar más del amor que a practicarlo. Se vuelve efusivo, demasiado amistoso y adulador. Necesita ser necesitado: se mete en la vida de los demás, crea dependencias y espera reconocimiento. Puede volverse posesivo y sentirse indispensable.",
+ malsano:"Se vuelve manipulador: hace sentir culpables a los demás y les recuerda todo lo que les dio. Se engaña sobre sus propios motivos egoístas, se siente con derecho a exigir y termina como víctima o mártir, resentido, con problemas de salud que expresan su malestar.",
+ niveles:["Ama sin condiciones","Empático y afectuoso","Generoso y servicial","Complaciente y efusivo","Posesivo e intrusivo","Se cree indispensable","Manipulador","Se siente con derechos","Víctima resentida"],
+ com:{verbal:"Le encanta charlar; su conversación es cálida e íntima. Saluda con elogios (“¡Qué lindo estás!”) y enseguida entra en lo personal. Sabe escuchar y pregunta por la familia y por cómo te sentís.",
+  gestos:"Disfruta del contacto físico: abrazos, caricias, besos al saludar. Se mueve con naturalidad en el espacio del otro.",
+  espacio:"Se rodea de fotos y recuerdos de sus afectos. Su casa es acogedora; cuando llegás, ya te está ofreciendo algo para tomar o comer.",
+  tiempo:"El tiempo es una oportunidad para vincularse y estar disponible para otros. Se vuelve impersonal solo cuando tiene que cumplir obligaciones.",
+  vestido:"Se viste más para gustar a las personas importantes de su vida que para sí mismo. Prefiere colores cálidos y un estilo informal."},
+ virtud:{nombre:"La humildad",practicas:["Aceptar tus propias limitaciones, necesidades y sentimientos.","Reconocer que, al ayudar, tus motivos a veces se mezclan con necesidades propias.","Darte cuenta de que el enojo o el resentimiento señalan necesidades tuyas que no atendiste.","Aprender a “ser” vos mismo más que a “hacer” por los demás.","Quererte más allá de lo útil que puedas ser para otros.","Dejarte querer sin tener que comprar o ganarte el afecto.","Alegrarte cuando las personas se vuelven independientes.","Buscar momentos a solas para mirar hacia adentro."]},
+ vicio:{nombre:"El orgullo",desc:"Su pecado capital es el orgullo, que la tradición cristiana consideraba el más grave. Cree que sirve por los motivos más altos y sin segundas intenciones, y le cuesta observar lo que de verdad lo mueve. En el fondo está convencido de que él no necesita a nadie y de que los demás sí lo necesitan a él.",
+  manif:[["Sobrevaloración","Exagera sus méritos y cree que puede resolver cualquier crisis y rescatar a cualquiera."],["Hipersensibilidad","Sufre mucho ante la crítica o el rechazo; cuando se siente herido se cierra o se vuelve agresivo."],["Hedonismo","Busca gratificaciones, también en la comida, para compensar la falta de afecto."],["Seducción","Usa palabras y gestos para atraer la atención de quienes admira."],["Proyección","Atribuye a otros sus propias necesidades para justificar su ayuda."]]},
+ pasion:{nombre:"El orgullo",texto:"Para Naranjo y Colodrón, el orgullo del 2 es la necesidad de sentirse especial e indispensable en la vida de los demás. Seduce, da y cuida, muchas veces para recibir a cambio amor y reconocimiento, y le cuesta reconocer su propia carencia. Detrás de la imagen de persona plena que todo lo da, hay una necesidad de afecto que no se anima a mirar.",
+  camino:"Cuando el 2 atraviesa su propia carencia y reconoce lo que le falta, puede dar sin esperar nada a cambio. Entonces el orgullo de creerse especial se transforma en un amor incondicional que, paradójicamente, es humilde."},
+ crece:4,crecTxt:"Se conecta con todos sus sentimientos, incluidos los negativos, y los acepta tanto como los positivos. Se vuelve emocionalmente honesto, se acepta sin condiciones y se siente querido por lo que es y no por lo que hace. Puede expresar lo más auténtico de sí con creatividad, y lo que da a los demás deja de ser un intercambio.",
+ estres:8,estrTxt:"Se vuelve agresivo, demandante y controlador. Reclama lo que dio, se siente con derecho a cobrarse el afecto y puede amenazar o dominar a quienes antes cuidaba.",
+ alas:{1:"Servicial con un fuerte sentido del deber; más reservado, ético y algo crítico.",3:"Más sociable, encantador y ambicioso; disfruta de ser visible y apreciado."},
+ trabajo:"Es el corazón del equipo: recuerda cumpleaños, nota quién está mal y conecta a las personas. Brilla en atención, servicio y liderazgo cercano. Necesita sentir que su aporte se valora.",
+ familia:"Vive el jopói: da sin que se lo pidan y sostiene a la familia grande. Siempre llega con chipa o con una mano. El riesgo es cargar con todo y después sentir que nadie lo nota.",
+ recs:["Preguntate qué necesitan realmente los demás y ayudalos a conseguirlo, aunque no sea lo que vos querés darles.","Dejá que tu bondad atraiga a la gente por sí sola. Valorá los talentos de otros sin necesitar que dependan de vos.","Observá tus motivos ocultos: el deseo de controlar, la agresividad, los comentarios hirientes.","No llames la atención sobre tus buenas obras ni las recuerdes después de hacerlas.","No estés siempre “haciendo” por los demás, ni intentes comprar el cariño con regalos o elogios.","Cuidá las amistades de siempre; el entusiasmo por las nuevas puede hacerte descuidar las que ya tenés.","Probá hacer el bien en silencio, sin que nadie se entere.","No seas posesivo con tus amigos: compartilos. Si el cariño es genuino, no se pierde.","Mirá con honestidad cuán mezclados pueden estar tus motivos, aunque muchas veces sean buenos.","Amar sin interés es uno de los mayores logros humanos. Si lo lográs, cuidalo y no lo conviertas en una deuda."]},
+
+3:{name:"El Motivador",alias:"también llamado el Triunfador",lema:"Lo que me propongo, lo logro.",
+ rasgos:"Seguro de sí, competitivo y ambicioso; en su peor versión, narcisista.",
+ triada:"sentir",triadaPos:"Más fuera de contacto con el Sentir",
+ intro:"Es el tipo de la tríada del Sentir más alejado de sus propios sentimientos. Puso toda su energía en aprender a llevarse bien con los demás para ganarse su atención y admiración, y aprendió a proyectar la imagen que el entorno espera. Como su sentido interior de sí mismo queda poco desarrollado, cuando se aparta de su rol a veces no sabe bien quién es.",
+ deseo:"Sentirse valioso y exitoso.",miedo:"No valer nada sin sus logros.",
+ sano:"Es seguro de sí, con alta autoestima, adaptable, enérgico y muchas veces carismático. Busca mejorar y destacar, y suele ser admirado: otros quieren imitarlo. Es buen comunicador y motivador. En su mejor momento es auténtico, sencillo y generoso con su talento.",
+ promedio:"Empieza a compararse y competir para sentirse superior: le importan el estatus, la carrera y el prestigio. Es pragmático y eficiente, pero también calculador y pendiente de la impresión que da. Aparecen problemas con la intimidad y el compromiso, y la tentación de exagerar o adornar la verdad.",
+ malsano:"Por miedo al fracaso y a la humillación se vuelve oportunista y explotador: usa a los demás para mantenerse arriba. Miente, traiciona y sabotea a quien percibe como rival, y puede volverse vengativo con quien lo deja en evidencia.",
+ niveles:["Auténtico y sencillo","Seguro y adaptable","Ejemplar y motivador","Competitivo","Pendiente de la imagen","Exagera y se promociona","Oportunista","Engañoso","Implacable"],
+ com:{verbal:"Es un especialista en comunicar: persuade y vende sus ideas con facilidad. La palabra es su herramienta para conquistar y lograr resultados. Lee rápido lo que el otro quiere escuchar.",
+  gestos:"Su lenguaje corporal es vivo, entusiasta y cautivador; usa los gestos justos para impresionar y generar confianza.",
+  espacio:"Vive en un “desorden ordenado” por su vida intensa. Más que fotos afectivas, exhibe diplomas, trofeos y símbolos de sus logros.",
+  tiempo:"El tiempo es un medio para lograr objetivos: vale cuando se usa bien. Suele vivir con la agenda llena y proyectado hacia el futuro.",
+  vestido:"Se viste según la imagen que quiere dar y suele pedir opinión. Pasa con soltura de lo informal a lo elegante; lo importante es causar buena impresión."},
+ virtud:{nombre:"La verdad",practicas:["Ser transparente y jugar con las cartas sobre la mesa, sin esconderte detrás del cargo o la imagen.","Darte cuenta de las máscaras que usás para manejar a otros o a vos mismo.","Escuchar tus sentimientos y necesidades, sin refugiarte en la acción o los proyectos.","Distinguir entre hacer y sentir, sobre todo en las relaciones.","Reconocer la distancia entre tu imagen pública y tu mundo privado.","No dejar que la eficiencia sea el único criterio para valorar personas y situaciones.","Aceptar el fracaso como camino hacia la verdad y animarte a decir “me equivoqué” o “perdoname”."]},
+ vicio:{nombre:"El engaño",desc:"Su pecado capital es el engaño: para tener éxito embellece y maquilla la realidad. Es capaz de venderle heladeras a los esquimales. Llega a creer que es verdadero todo lo que funciona.",
+  manif:[["Orientación al éxito","Intuitivo y competitivo, solo le interesan los resultados y sabe acelerar para avanzar."],["Manipulación","Habilidad instintiva para ganarse la admiración y presentar sus proyectos de forma convincente."],["Pragmatismo","Para él es verdadero lo que es práctico; no hay verdades fuera de lo útil."],["Conquista","Usa sus dotes sociales para seducir; cada conquista afectiva es un logro más."],["Doble vida","Una vida visible, de imagen y adaptación, y otra interior que esconde."]]},
+ pasion:{nombre:"La vanidad",texto:"Para Naranjo y Colodrón, la vanidad del 3 es sutil: busca llamar la atención sin que se note. No suele ser el fanfarrón típico; su velo es la naturalidad, el optimismo y la eficiencia. Como un camaleón, se adapta a cualquier ambiente y triunfa en él. Vive para la mirada de los demás y termina confundiéndose con su propia imagen.",
+  camino:"Debe enfrentar el miedo a mirar hacia adentro, a detenerse, a estar sin hacer y a vivir el presente sin planificar. La meditación y los espacios de silencio lo ayudan a llegar a la transparencia y a la honestidad."},
+ crece:6,crecTxt:"Se compromete con algo o con alguien más allá de sí mismo y descubre que su valor no disminuye por ser parte de algo mayor. Al mostrar sin miedo sus partes menos desarrolladas y sentirse aceptado, gana una base sólida. Puede admirar y ser amado sin competir, y reconoce límites a lo que puede exigirse a sí mismo y a los demás.",
+ estres:9,estrTxt:"Se desconecta, pierde la motivación y el rumbo. Cae en la apatía, se anestesia con rutinas o distracciones y puede quedar paralizado.",
+ alas:{2:"Más encantador, sociable y cálido; quiere ser querido además de admirado.",4:"Más introspectivo y profesional; cuida la autenticidad y busca destacar en algo con estilo propio."},
+ trabajo:"Convierte objetivos en resultados y contagia empuje. Le va muy bien en ventas, gestión y emprendimientos. Necesita metas claras y reconocimiento, y puede caer en trabajar sin pausa.",
+ familia:"Quiere que su familia esté orgullosa y muchas veces es “el que progresó”. A veces llega tarde al asado por una reunión. Su desafío es estar presente sin agenda.",
+ recs:["Practicá la cooperación. No humilles ni excluyas a los demás para quedar mejor parado.","Sé honesto con tus logros, sin exagerarlos ni adornarlos.","Sé confiable: guardá los secretos y no los uses a tu favor.","Desarrollá conciencia social: le debés mucho a tu comunidad.","No te conviertas en un “clon” de lo que esperan de vos; descubrí qué querés vos realmente.","Apoyá y alentá a los demás; expresá tu admiración por ellos, sobre todo cuando lo merecen.","Usá tu energía y tu humor para entusiasmar a otros en proyectos que valgan la pena.","Notá cuándo te enojás porque sentís que te menosprecian; muchas veces ahí está la raíz de tus problemas.","Si la competencia se descontrola, termina en hostilidad y desprecio. Frenala a tiempo.","Tenés capacidades espirituales: buscá ser la mejor persona que podés ser, no solo la más exitosa."]},
+
+4:{name:"El Artista",alias:"también llamado el Individualista",lema:"Lo verdadero es lo que se siente.",
+ rasgos:"Creativo, intuitivo, individualista e introvertido; en su peor versión, depresivo.",
+ triada:"sentir",triadaPos:"Sentir subdesarrollado (lo expresa poco)",
+ intro:"Es el tipo de la tríada del Sentir que menos expresa sus sentimientos. Los vive con mucha intensidad, mezclados con ideas negativas sobre sí mismo y los demás, y por eso aprendió a guardárselos, para calmarlos y para evitar la vergüenza o el rechazo. Con el tiempo, guardarlo todo lo aleja de los demás.",
+ deseo:"Encontrar su identidad y su sentido.",miedo:"No tener identidad ni significado.",
+ sano:"Es introspectivo y está en contacto con sus emociones e impulsos. Sensible, intuitivo, discreto y respetuoso. Auténtico y emocionalmente honesto, con una mirada irónica y profunda de la vida. En su mejor momento es un creador inspirado que transforma su experiencia en algo valioso para todos.",
+ promedio:"Le da a la vida un tono romántico y estético, y expresa lo que siente de forma indirecta, a través del arte o la belleza. Se refugia en la fantasía, se ensimisma y se vuelve tímido y cohibido. Duda de sí, se compara, se siente distinto y se permite caprichos porque siente que la vida le debe algo.",
+ malsano:"Cuando sus sueños fracasan, se enoja consigo mismo y se deprime profundamente. Se aísla, se avergüenza, se paraliza y se desprecia; puede llegar a sentir que nada tiene sentido.",
+ niveles:["Creador inspirado","Introspectivo y sensible","Auténtico y expresivo","Romántico","Ensimismado","Autocomplaciente","Alienado","Se desprecia","Desesperado"],
+ com:{verbal:"Sufre porque siente que no logra expresar todo lo que vive. Su forma de hablar tiene tono de lamento, con suspiros y frases incompletas: “No sé cómo explicarte”, “No sé si me entendés”.",
+  gestos:"Comunica con suspiros y miradas que dicen más que mil palabras; es reservado con el contacto físico.",
+  espacio:"Su casa expresa su mundo interior: elige con cuidado plantas, cuadros, colores y objetos que hablen por él.",
+  tiempo:"Lo mide por su estado de ánimo: si está triste, el tiempo se detiene; si está contento, vuela. Suele mirar al pasado lleno de oportunidades perdidas.",
+  vestido:"La ropa es una forma de mostrar su originalidad. Prefiere colores apagados y un estilo propio que lo distinga."},
+ virtud:{nombre:"La armonía (ecuanimidad)",practicas:["Aceptar con serenidad que no todos tus deseos se cumplan.","Sanar la tensión entre desear lo que no tenés y rechazar lo que sí tenés.","Vivir el presente, sin nostalgia del pasado ni fantasías de un futuro ideal.","No caer en la autocomplacencia: poner tu energía en acciones concretas y en tus vínculos.","Valorar tanto lo único como lo común y cotidiano, en vos y fuera de vos.","Transformar tus heridas en compasión por el sufrimiento de los demás.","Recuperar el equilibrio en tu vida afectiva.","Quererte y aprender a ser buena compañía para vos mismo."]},
+ vicio:{nombre:"La envidia",desc:"Su pecado capital es la envidia, que nace de una insatisfacción con lo que es o lo que tiene. Siente que a los demás les fue dado algo esencial que a él le falta, y eso lo lleva a compararse todo el tiempo.",
+  manif:[["Pobre imagen de sí","Insatisfacción con lo que es y lo que tiene; siente que algo esencial le falta."],["Competencia","Miedo a encontrarse con alguien más interesante o atractivo que le quite su lugar especial."],["Intensidad emotiva","Para sentirse vivo y especial, intensifica el drama y busca emociones fuertes."],["Romance con el sufrimiento","El dolor le da profundidad y lo hace sentir único, por eso le cuesta soltarlo."]]},
+ pasion:{nombre:"La envidia",texto:"Según Naranjo y Colodrón, la envidia del 4 es una mezcla de carencia y tristeza: un vacío existencial que intenta llenar con lo que tienen otros o con ilusiones de un futuro ideal. Se siente atraído por lo que no puede tener y rechaza lo que sí está a su alcance.",
+  camino:"Ese vacío, si no se llena con falsas ilusiones, puede ser fértil. El 4 puede transformar el hábito de sufrir en un sufrimiento consciente y empático, que se vuelve verdadera compasión."},
+ crece:1,crecTxt:"Sale del ensimismamiento y se enfoca en algo objetivo, más allá de sus sentimientos y fantasías. Se pone límites con gusto, trabaja con constancia para desarrollar su potencial y contribuir al mundo. Su intuición se apoya en un buen juicio, y su obra le da motivos genuinos para valorarse.",
+ estres:2,estrTxt:"Se vuelve dependiente y busca desesperadamente que alguien lo rescate. Puede volverse posesivo y manipular con la culpa para no quedarse solo.",
+ alas:{3:"Más expresivo, sociable y ambicioso; cuida su imagen y quiere que su originalidad sea reconocida.",5:"Más introspectivo, original y reservado; vive en su mundo interior y es más intelectual."},
+ trabajo:"Aporta originalidad, sentido estético y una mirada distinta. Brilla en diseño, comunicación, arte y roles con propósito. Le cuesta lo rutinario y sin alma.",
+ familia:"Pone palabras a lo que todos sienten y guarda las historias de la familia. Disfruta más un encuentro profundo que una fiesta grande. Puede retirarse cuando se siente incomprendido.",
+ recs:["No les prestes tanta atención a tus sentimientos: no son un apoyo firme y cambian todo el tiempo.","No esperes a “estar con ganas” para hacer las cosas. Comprometete con un trabajo útil, por pequeño que sea.","La autoestima crece con experiencias positivas, te sientas listo o no. Animate a buscarlas.","La autodisciplina sana, como dormir bien o hacer ejercicio, te fortalece de a poco.","Evitá las largas conversaciones imaginarias, sobre todo las negativas, resentidas o demasiado románticas.","Hablá abiertamente con alguien de confianza; necesitás expresar lo que sentís sin filtro.","Hacer algún servicio a tu comunidad te saca de vos mismo y te da otra perspectiva.","No caigas en la autocompasión ni en quejarte de tu pasado, de tus padres o de tus relaciones fallidas.","No te tomes todo tan a pecho; no cada comentario va dirigido contra vos.","Tratate como tratarías a un amigo. Solés ser más duro con vos que con cualquier otra persona."]},
+
+5:{name:"El Pensador",alias:"también llamado el Investigador",lema:"Primero entender, después actuar.",
+ rasgos:"Perceptivo, analítico y original; en su peor versión, excéntrico y desconfiado.",
+ triada:"hacer",triadaPos:"Hacer subdesarrollado",
+ intro:"Es el tipo de la tríada del Hacer que menos desarrolló su capacidad de actuar. Reemplaza la acción por el pensamiento: quiere entender todo antes de moverse y siente que nunca sabe lo suficiente. Así puede pasar mucho tiempo analizando mientras la vida pasa.",
+ deseo:"Ser capaz y competente.",miedo:"Ser inútil, invadido o incapaz.",
+ sano:"Observa todo con curiosidad y agudeza; entiende lo que otros no ven y anticipa lo que viene. Se concentra, aprende a fondo y se vuelve experto e innovador. En su mejor momento es un visionario que comprende el mundo con profundidad y aporta descubrimientos valiosos.",
+ promedio:"Se refugia en las ideas y en sus proyectos, y se aleja de la gente y de la acción. Se vuelve teórico, intenso y distante, y puede volverse provocador o despreciar a quien cree menos inteligente. Le cuesta comprometerse y conectar con sus emociones.",
+ malsano:"Se aísla cada vez más, desconfía y se vuelve excéntrico. Rechaza a los demás, cae en el nihilismo y puede perderse en ideas delirantes o buscar desaparecer del mundo.",
+ niveles:["Visionario","Observador agudo","Experto innovador","Teórico","Desapegado","Provocador","Nihilista","Delirante","Busca el olvido"],
+ com:{verbal:"Habla de forma lógica y analítica; quiere entender y hacerse entender. Pregunta “¿Se entiende?”, “¿Me explico?”, “Pasemos al segundo punto”.",
+  gestos:"Está tan metido en sus ideas que se olvida del cuerpo; su mensaje puede parecer seco y distante.",
+  espacio:"Prefiere lugares sobrios, con lo que refleja sus intereses: libros, computadora, colecciones. Necesita un espacio propio y privado.",
+  tiempo:"Lo vive como algo abstracto; si algo le interesa, pierde la noción de la hora. Nunca le alcanza para aprender todo lo que quiere.",
+  vestido:"Prioriza lo funcional y práctico. No sigue la moda y prefiere pasar desapercibido."},
+ virtud:{nombre:"El desapego (desinterés)",practicas:["Compartir lo que sabés sin miedo a quedarte sin nada.","Reconocer que hay muchas formas de inteligencia, no solo la tuya.","Dedicar tiempo a los demás sin sentir que lo desperdiciás.","Tomar la iniciativa de mostrar lo que sentís para crear intimidad.","Involucrarte en la acción y con la gente para no aislarte.","Trabajar en equipo, sin confiar solo en tus recursos.","Dejar que la vida te enseñe, más allá de tus esquemas mentales.","Conectar con tu cuerpo y llevar tu energía a la acción."]},
+ vicio:{nombre:"La avaricia",desc:"Su pecado capital es la avaricia, pero no tanto de dinero: retiene su tiempo, su energía, su conocimiento y su privacidad, por miedo a quedarse vacío o a ser invadido.",
+  manif:[["Autonomía","Fuerte necesidad de independencia y exclusividad; se las arregla con muy poco."],["Orientación al saber","Acumula conocimientos como si fueran un patrimonio que lo protege."],["Distancia emocional","Poca conciencia de sus emociones y dificultad para expresarlas."],["Huida del compromiso","Se siente incómodo con compromisos largos que limiten su libertad."],["Postergar la acción","Elabora tanto en la mente que la acción nunca llega."]]},
+ pasion:{nombre:"La avaricia",texto:"Para Naranjo y Colodrón, el “avaro” del eneagrama no es el de Molière: no lo mueve el dinero, sino el afán de acumular conocimiento y claves para entender el mundo, como forma de controlarlo desde lejos. Retiene afecto y presencia por miedo a quedar vacío.",
+  camino:"La línea entre la distancia sana del observador y el miedo a la intimidad es delgada. Si se da cuenta de esa trampa, puede conectar con la vida sin intermediarios: implicarse, compartir y sentir."},
+ crece:8,crecTxt:"Deja de solo observar el mundo y se involucra en él. Confía en sí mismo y entiende que no necesita saberlo todo para actuar: aprende actuando. Se anima a poner sus ideas en juego, conduce a otros con seguridad y aporta su saber en la práctica, incluso liderando.",
+ estres:7,estrTxt:"Se dispersa y se acelera: salta de idea en idea, se vuelve impulsivo e hiperactivo, y busca escapar de la angustia con distracciones.",
+ alas:{4:"Más creativo, imaginativo y emocional; une el análisis con una mirada artística.",6:"Más práctico, organizado y cooperador; aplica su saber a resolver problemas concretos."},
+ trabajo:"Es el especialista al que todos consultan. Aporta análisis, datos y soluciones innovadoras. Necesita tiempo para pensar y espacio sin interrupciones constantes.",
+ familia:"Quiere mucho, aunque lo demuestre poco. Prefiere una charla a fondo con una persona antes que una reunión de cincuenta. Necesita su rincón para recargar energía.",
+ recs:["Observá la realidad sin imponerle ideas previas: analizá menos y mirá más.","Aprendé a calmarte de forma sana: caminar, respirar, hacer algo con las manos.","Elegí prioridades entre todas las posibilidades que ves; no todo es igual de importante.","No saques conclusiones apuradas ni te aferres a ellas cuando llegan datos nuevos.","Animate a confiar en la gente y a abrirte emocionalmente, aunque te cueste.","Sé más cooperador y menos solitario; aprender a apoyar a otros te enriquece.","Notá si tu intensidad incomoda a los demás; no todos comparten tu fascinación por tus temas.","No desprecies a quien te parece menos inteligente: puede saber cosas que vos no.","Si otros te evitan, preguntate si no fuiste vos quien inició el distanciamiento.","Tu gran capacidad de comprender puede convertirse en compasión: ponete en el lugar del otro."]},
+
+6:{name:"El Lealista",alias:"también llamado el Leal",lema:"Juntos y con respaldo, llegamos.",
+ rasgos:"Simpático, leal, cumplidor y responsable; en su peor versión, dependiente y autodestructivo.",
+ triada:"hacer",triadaPos:"Más fuera de contacto con el Hacer",
+ intro:"Es el tipo de la tríada del Hacer más alejado de su capacidad de actuar por sí mismo. Duda de su propio criterio y busca apoyo en otros, en reglas o en autoridades antes de decidir. Oscila entre la obediencia y la rebeldía, entre la confianza y la sospecha.",
+ deseo:"Tener seguridad y apoyo.",miedo:"Quedarse sin sostén ni guía.",
+ sano:"Es simpático, confiable y comprometido. Genera vínculos fuertes, trabaja en equipo y cuida a su gente. En su mejor momento confía en sí mismo, se vuelve valiente, independiente y un líder que inspira confianza.",
+ promedio:"Busca seguridad en el grupo, la institución o la autoridad. Se vuelve obediente pero ambivalente: duda, posterga y se pone a la defensiva. Puede pasar de la sumisión al enojo, desconfiar y culpar a otros de sus problemas.",
+ malsano:"La inseguridad y el miedo lo dominan. Se vuelve dependiente, se siente perseguido, ve amenazas en todos lados y puede reaccionar con agresividad o autodestruirse.",
+ niveles:["Valiente y confiado","Simpático y confiable","Comprometido y cooperador","Obediente y leal","Ambivalente","Defensivo y acusador","Inseguro y dependiente","Se siente perseguido","Autodestructivo"],
+ com:{verbal:"Habla con prudencia: “¿Puedo...?”, “Si me permitís...”, “Antes de decidir quisiera escuchar a los demás”. Su forma de hablar revela dudas al tomar postura.",
+  gestos:"Ni muy espontáneo ni muy rígido: busca una imagen correcta. Es un anfitrión atento y cuida cada detalle para que el invitado se sienta bien.",
+  espacio:"Su casa está llena de fotos familiares, regalos, símbolos religiosos y recuerdos. Guarda todo porque “algún día puede servir”.",
+  tiempo:"El reloj es una autoridad a la que hay que obedecer; ser responsable es ser puntual. A veces se siente agobiado por los horarios.",
+  vestido:"Viste cómodo, práctico y sin gastar de más. En ocasiones especiales consulta cómo vestirse para estar a la altura."},
+ virtud:{nombre:"El valor",practicas:["Fortalecer tu propia autoridad interior.","Correr riesgos y tomar decisiones para ganar confianza en vos.","Creer más en los valores de fondo que en las normas o las instituciones.","Pasar a la acción en lugar de imaginar peligros que muchas veces no existen.","Hacerte cargo de tus decisiones, sin esconderte detrás de la autoridad.","Decir lo que pensás con claridad, sin dejarte frenar por el miedo a la crítica.","Decidir según tus valores, aunque los demás piensen distinto.","Ser audaz: no tenerle miedo a tener coraje."]},
+ vicio:{nombre:"El miedo",desc:"Su pecado capital es el miedo: duda no porque no sepa qué hacer, sino porque teme equivocarse y quedarse sin apoyo. Busca certezas fuera de sí y desconfía de sus propias capacidades.",
+  manif:[["Incertidumbre crónica","Vacila y posterga por temor a las consecuencias de decidir."],["Dependencia","Recupera la seguridad cumpliendo reglas y siguiendo a quien tiene autoridad."],["Sospecha","No se fía fácilmente y duda de las intenciones de los demás."],["Intolerancia a la ambigüedad","Necesita claridad y que las cosas se llamen por su nombre."],["Búsqueda de aceptación","Cuida su imagen de buena persona y cumplidora para no ser rechazado."]]},
+ pasion:{nombre:"El miedo",texto:"Según Naranjo y Colodrón, el miedo del 6 toma formas muy distintas: el fóbico, que busca protección y obedece, y el contrafóbico, que desafía al peligro para demostrar que no tiene miedo. Por eso en este tipo conviven personajes tan diferentes como Don Quijote o Woody Allen. La duda y la desconfianza son su sello.",
+  camino:"Vivir más en el presente sin imaginar desgracias futuras, mirar la realidad sin agregarle el quinto pie al gato, confiar primero en sí mismo para poder confiar en los demás y abrazar la fe en la vida."},
+ crece:9,crecTxt:"Resuelve su ambivalencia y su angustia. Se vuelve más abierto, receptivo y compasivo, emocionalmente estable y sereno. Gana autonomía y, paradójicamente, se acerca más a los demás. Como confía en sí mismo, puede confiar en otros, y suma al humor la paz y el optimismo del 9.",
+ estres:3,estrTxt:"Para compensar su inseguridad se vuelve arrogante, competitivo y agresivo. Sobreactúa una seguridad que no tiene y puede atacar a quien siente como amenaza para demostrar su fuerza.",
+ alas:{5:"Más independiente, intelectual y reservado; busca seguridad en el conocimiento y los sistemas.",7:"Más sociable, divertido e inquieto; busca seguridad en los amigos y la actividad."},
+ trabajo:"Es el que piensa en el plan B y cuida al equipo. Aporta confiabilidad, prevención y constancia. Rinde mejor con un liderazgo claro y reglas justas.",
+ familia:"Es fiel a su gente, a su barrio y a sus tradiciones. No falta a los compromisos: cumpleaños, velorios, fiestas patronales. Su forma de querer es estar, siempre.",
+ recs:["Recordá que todos sentimos angustia. Usala para entender qué te preocupa en lugar de dejar que te domine.","Tratá de no ponerte a la defensiva ni culpar a otros cuando estás nervioso.","Identificá qué te hace reaccionar de más bajo presión; casi nunca es tan grave como parece.","Trabajá tu confianza: hay personas en tu vida que se interesan por vos y son confiables.","Los demás tienen mejor opinión de vos de lo que imaginás; tus miedos dicen más de vos que de ellos.","Asumí tus responsabilidades con madurez, también cuando te equivocás.","La seguridad que buscás afuera solo llega cuando te sentís seguro con vos mismo.","No idolatres a ninguna autoridad ni te escudes en “yo solo cumplía órdenes”.","No mandes señales confusas: decí con claridad lo que pensás y lo que querés.","Animate a levantar la voz, también ante el jefe o ante quien necesitás. Es un acto de valor."]},
+
+7:{name:"El Generalista",alias:"también llamado el Entusiasta",lema:"La vida es una sola, y hay que vivirla.",
+ rasgos:"Realizado, extrovertido y versátil; en su peor versión, impulsivo e inmoderado.",
+ triada:"hacer",triadaPos:"Hacer sobredesarrollado",
+ intro:"Es el tipo de la tríada del Hacer que desarrolló en exceso su capacidad de actuar. Siempre tiene planes, proyectos y experiencias nuevas; se mueve rápido para no aburrirse ni sentir dolor. El problema es que tanta actividad puede dejarlo en la superficie de las cosas.",
+ deseo:"Ser feliz y sentirse libre.",miedo:"Sufrir, aburrirse o quedar atrapado.",
+ sano:"Es entusiasta, alegre, versátil y lleno de energía. Disfruta de la vida y contagia optimismo. Es productivo y práctico. En su mejor momento es profundamente agradecido, se asombra ante lo simple y encuentra plenitud sin necesitar más.",
+ promedio:"Quiere probar todo y no perderse nada: se vuelve consumista, disperso e hiperactivo. Salta de un plan a otro, evita lo aburrido o doloroso, y puede volverse exagerado, superficial y excesivo.",
+ malsano:"Se vuelve impulsivo y escapista, sin control sobre sus apetitos. Busca evadirse a toda costa y puede caer en excesos peligrosos; cuando ya no puede escapar, se derrumba.",
+ niveles:["Agradecido y pleno","Entusiasta","Realista y productivo","Consumidor de experiencias","Disperso","Excesivo","Escapista","Descontrolado","Paralizado por el pánico"],
+ com:{verbal:"Habla de forma viva y contagiosa, con muchos detalles y adjetivos: “¡Estuvo genial!”, “¡Increíble!”, “¡Fue de locos!”.",
+  gestos:"Es el más espontáneo y expresivo: humor contagioso, gestos amplios, sonrisa y ojos chispeantes. Es la imagen del niño eterno.",
+  espacio:"Le gustan los ambientes amplios, luminosos y llenos de color, cuadros y objetos que transmitan alegría.",
+  tiempo:"Lo vive como un horizonte sin límites para mil proyectos. Le cuesta ser puntual porque se entretiene en el camino; odia la rutina y posterga lo difícil.",
+  vestido:"Viste lo que le resulta cómodo y agradable, según su ánimo. Prefiere prendas holgadas y colores alegres."},
+ virtud:{nombre:"La sobriedad",practicas:["Valorar cada momento con todo lo bueno que trae.","Cumplir los compromisos sin buscar evasiones ni cambios de último momento.","Escuchar a quien sufre sin pintarle todo de color de rosa.","Elegir prioridades con prudencia, sin dejarte llevar por el impulso.","No imponer tu ritmo ni tu humor a los demás.","Celebrar la vida sin negar su lado difícil.","Aceptar los problemas y las cruces cotidianas como parte de tu crecimiento.","Buscar el silencio y la reflexión para ir a lo profundo de las cosas."]},
+ vicio:{nombre:"La destemplanza (gula)",desc:"Su pecado capital es la falta de moderación: quiere más de todo, ya. Busca placer, novedades y estímulos para no sentir el vacío ni el dolor.",
+  manif:[["Permisividad","Se da todos los gustos y se concede siempre una excepción."],["Seducción","Usa su encanto para caer bien y salirse con la suya."],["Falta de perseverancia","El entusiasmo inicial se apaga y abandona lo que empezó."],["Rebeldía","Se opone a la autoridad cuando limita su libertad o su diversión."]]},
+ pasion:{nombre:"La gula",texto:"Para Naranjo y Colodrón, la gula del 7 no es solo de comida: es hambre de experiencias, planes y placeres para llenar un vacío. Es difícil de reconocer porque “goloso” no suena tan grave. Según el aspecto que predomine, se lo ha llamado epicúreo, soñador, planificador o charlatán.",
+  camino:"Cuando la vida le da un golpe fuerte y se queda sin estrategias, puede caer en una tristeza que siempre evitó. Esa crisis puede ser una bendición: una oportunidad para cambiar la gula por introspección, silencio y aceptación de las luces y sombras de la vida."},
+ crece:5,crecTxt:"Ya no teme que le quiten la felicidad y se compromete a fondo. La gratitud lo lleva a querer conocer más el mundo, no solo consumirlo: pasa de consumidor a contemplador. Se concentra, profundiza y, con todo su talento y entusiasmo, aporta algo original.",
+ estres:1,estrTxt:"Se vuelve rígido, crítico e impaciente. Se enoja con los demás por no estar a la altura y puede volverse moralista y perfeccionista.",
+ alas:{6:"Más comprometido, cálido y responsable; disfruta en grupo, aunque también es más ansioso.",8:"Más enérgico, práctico y ambicioso; va por lo que quiere con decisión y puede ser más materialista."},
+ trabajo:"Genera ideas y levanta el ánimo del equipo. Brilla en innovación, eventos, ventas y proyectos nuevos. Le cuestan el seguimiento y la rutina.",
+ familia:"Es el alma del asado y de la ronda de tereré, siempre con un plan nuevo. Llena la casa de risas y de proyectos de viaje. Su desafío es quedarse cuando la charla se pone seria.",
+ recs:["Observá tus impulsos antes de seguirlos; no todos merecen tu atención.","Aprendé a escuchar a los demás y a disfrutar del silencio y la soledad.","No necesitás tenerlo todo ya: lo que te tienta hoy seguramente seguirá ahí mañana.","Elegí calidad antes que cantidad, sobre todo en tus experiencias.","Asegurate de que lo que deseás sea bueno para vos a largo plazo.","La felicidad suele llegar de forma indirecta, al dedicarte a algo que vale la pena.","Cuidate de perder el control: tenés mucha energía y apetitos fuertes.","Usá tu humor con cuidado; un chiste puede herir más de lo que creés.","Buscá formas de dar más que de recibir.","Tu gran don es la gratitud y la alegría. Tomate tiempo para agradecer lo que ya tenés."]},
+
+8:{name:"El Líder",alias:"también llamado el Desafiador",lema:"Las cosas se enfrentan, no se esquivan.",
+ rasgos:"Poderoso, expansivo y enérgico; en su peor versión, dictatorial y destructivo.",
+ triada:"relacionarse",triadaPos:"Relacionarse sobredesarrollado",
+ intro:"Es el tipo de la tríada del Relacionarse que desarrolló en exceso su capacidad de imponerse al entorno. Se relaciona con el mundo desde la fuerza y el control: quiere dominar su ambiente para no ser dominado. Esa energía puede proteger y construir, o arrasar.",
+ deseo:"Protegerse y tener el control de su vida.",miedo:"Ser dañado o controlado por otros.",
+ sano:"Es seguro de sí, decidido y directo. Defiende a los suyos y a los más débiles, y usa su fuerza para construir. En su mejor momento es magnánimo y heroico: pone su poder al servicio de otros y abre oportunidades para muchos.",
+ promedio:"Busca recursos y poder para no depender de nadie. Se vuelve emprendedor y pragmático, pero también dominante, desafiante y confrontativo. Le cuesta mostrar vulnerabilidad y puede intimidar.",
+ malsano:"Se vuelve despiadado y autoritario: quiere imponerse a cualquier precio, se siente invencible y puede destruir lo que no controla.",
+ niveles:["Magnánimo y heroico","Seguro de sí","Líder constructivo","Emprendedor pragmático","Dominante","Desafiante y amenazador","Despiadado","Se cree omnipotente","Destructivo"],
+ com:{verbal:"Se comunica confrontando: va directo al grano y pregunta “¿De qué lado estás?”. No es diplomático y se sorprende cuando su franqueza intimida. Algunos hablan fuerte; otros, más bajo pero siempre con energía.",
+  gestos:"Su presencia impone respeto. Usa pocos gestos, medidos e intencionados, que van a lo esencial.",
+  espacio:"Cada uno a su modo, pero todos necesitan controlar su espacio; si alguien lo invade sin permiso, reaccionan con fuerza.",
+  tiempo:"No se deja condicionar por el reloj: decide qué hacer y cuándo. Se impacienta cuando otros le imponen límites o demoras.",
+  vestido:"Viste como le gusta, sin importarle la opinión ajena: algunos sencillos y prácticos, otros clásicos y elegantes."},
+ virtud:{nombre:"La sencillez (inocencia)",practicas:["Dejar que el niño que llevás dentro se exprese.","Aprender a ser querido y no temido.","Mostrar tu lado tierno y vulnerable.","Prestar atención a tus sentimientos y a los de los demás, sin negarlos.","Aceptar que nadie es autosuficiente y que depender sanamente de otros es madurez.","Adaptarte a las personas y situaciones sin querer controlarlo todo.","Ser paciente y no juzgar apurado a las personas."]},
+ vicio:{nombre:"La arrogancia",desc:"Su pecado capital, según la planilla, es la arrogancia: la convicción de que su voluntad debe imponerse y de que puede con todo solo.",
+  manif:[["Control","Necesita dominar situaciones, ganar y salirse con la suya."],["Predominio de la acción","Su identidad está atada a la acción y a los resultados."],["Sarcasmo","Usa la burla o el castigo para marcar su superioridad."],["Confrontación","Se resiste con fuerza a todo lo que se opone a su voluntad."],["Insensibilidad","Su dureza puede volverlo poco sensible al dolor ajeno."]]},
+ pasion:{nombre:"La lujuria",texto:"Para Naranjo y Colodrón, la lujuria del 8 no se limita a lo sexual: es exceso, intensidad, querer más de todo, desafiar y dominar. Detrás de esa fuerza hay un miedo básico a ser lastimado o dominado.",
+  camino:"Cuando deja aflorar su vulnerabilidad y se libera de ese miedo, se disuelve la prepotencia y aparece la verdadera fuerza. Así puede abrazar causas más grandes, como Martin Luther King o Nelson Mandela, y redescubrir la alegría sencilla de estar vivo."},
+ crece:2,crecTxt:"Se abre a los demás en lugar de dominarlos y usa su poder para cuidar. Deja la posición de superioridad y se relaciona de igual a igual. Se vuelve empático, generoso y se preocupa sinceramente por los demás. Descubre el poder del amor en lugar del amor al poder y, al servir, obtiene lo que más necesita: ser querido por lo que es.",
+ estres:5,estrTxt:"Se retrae y se aísla, desconfía de todos y planea en secreto. Puede volverse frío, calculador y paranoico.",
+ alas:{7:"Más expansivo, aventurero e impulsivo; carismático y emprendedor.",9:"Más calmo, protector y receptivo; firme pero con una fuerza más tranquila."},
+ trabajo:"Toma el timón en la crisis y defiende al equipo. Aporta decisión, visión y resultados. Respeta a quien le habla de frente.",
+ familia:"Es el protector, el que sale a defender a cualquiera de los suyos. Mbarete por fuera, tierno con los de confianza. Le cuesta pedir ayuda.",
+ recs:["Actuá con moderación: tu verdadero poder se ve cuando podrías atacar y no lo hacés.","No sos la única persona en el mundo; los demás tienen los mismos derechos que vos.","Aprendé a ceder de vez en cuando; muchas veces hay poco en juego.","Reconocé cuánto dependés de otros, aunque te guste sentirte autosuficiente.","No sobrevalores el dinero como fuente de poder.","Buscá un objetivo más noble que tu propio interés; la familia y los vínculos son un buen comienzo.","Aceptar que hay algo más grande que vos, como Dios, la vida o una causa, te libera.","Si lastimaste a alguien, reparalo; reconocer el daño es un acto de fuerza.","Uno de tus mayores dones es crear oportunidades para otros. Usá tu poder para eso.","Pensá en el daño que podés hacer y en el bien que podés hacer: ¿cómo querés ser recordado?"]},
+
+9:{name:"El Conciliador",alias:"también llamado el Pacificador",lema:"Tranquilo nomás, todo se arregla.",
+ rasgos:"Pacífico, conciliador y tranquilizador; en su peor versión, pasivo y negligente.",
+ triada:"relacionarse",triadaPos:"Más fuera de contacto con el Relacionarse",
+ intro:"Es el tipo de la tríada del Relacionarse más distanciado de su capacidad de vincularse activamente con el entorno. Para mantener la paz, se adapta, se funde con los demás y se olvida de sí mismo. Evita el conflicto y, sin darse cuenta, también evita su propia vida.",
+ deseo:"Tener paz interior y armonía.",miedo:"El conflicto y la separación.",
+ sano:"Es sereno, receptivo y estable. Acepta a los demás, escucha sin juzgar y une a las personas. En su mejor momento está plenamente presente, en paz consigo mismo y activo en el mundo.",
+ promedio:"Se acomoda para no generar problemas: cede, posterga y minimiza. Se vuelve complaciente, distraído e indiferente; se anestesia con rutinas, televisión o comida y se resigna.",
+ malsano:"Se desconecta de todo: reprime lo que siente, se vuelve negligente y puede disociarse, como si no estuviera.",
+ niveles:["Sereno y presente","Receptivo y estable","Mediador generoso","Complaciente","Indiferente","Resignado","Reprimido","Disociado","Ausente"],
+ com:{verbal:"Le da igual atención a todo para no mostrar preferencias ni generar conflictos: “Estoy de acuerdo con uno por esto y con el otro por aquello”. Su tono es sereno y usa mucho el humor.",
+  gestos:"Medidos y tranquilos. Es acogedor, cordial y delicado en su afecto; disfruta de la compañía de amigos o de la tele.",
+  espacio:"Ambientes limpios y ordenados, con pocas cosas pero significativas.",
+  tiempo:"Tiene una relación relajada con el tiempo, es metódico y rutinario. Evita los horarios estresantes y deja para mañana lo que no puede hacer hoy.",
+  vestido:"No le da mucha importancia a la ropa: viste informal, cómodo y conservador."},
+ virtud:{nombre:"La diligencia (acción)",practicas:["Hacerte cargo de tus dones e involucrarte con la vida y con los demás.","Encender tu motivación y apretar un poco más el acelerador.","Afirmar tu valor: no se puede amar al prójimo sin amarse a uno mismo.","Desarrollar pasión por la vida sacando a la luz tus capacidades.","Canalizar tu enojo y tus sentimientos en lugar de taparlos.","Expresar tus opiniones y enfrentar los conflictos de forma constructiva.","Ponerte límites y plazos para no perderte en distracciones.","Tomar la iniciativa, fijar prioridades y decidir."]},
+ vicio:{nombre:"La pereza",desc:"Su pecado capital es la pereza, no tanto física como interior: la dificultad para ocuparse de sí mismo, de sus deseos y de su crecimiento.",
+  manif:[["Resistencia al cambio","Prefiere la rutina y puede resistir de forma pasiva y terca."],["Olvido de sí","Le cuesta registrar sus propias necesidades y opiniones."],["Compensaciones","Llena el vacío con comida, televisión, alcohol u otras distracciones."],["Distracción","Dispersa su energía en lo inmediato sin objetivos de fondo."],["Identidad prestada","Se define por su grupo, su familia o su pareja más que por sí mismo."]]},
+ pasion:{nombre:"La pereza",texto:"Para Naranjo y Colodrón, el 9 puede ser muy activo, pero se mueve más por los demás que por sí mismo. Su pereza es el olvido de sí: detecta y atiende las necesidades ajenas mientras se adormece frente a las propias. Suele ser terrenal, buen mediador y amante de la estabilidad y de las pocas sorpresas.",
+  camino:"Cuando despierta a su propio deseo y a su auténtica necesidad, puede surgir en él una fuerza sorprendente."},
+ crece:3,crecTxt:"Se vuelve seguro de sí y se interesa por desarrollar sus talentos. Deja de vivir a través de otros y se afirma sin agresividad. No teme el cambio y conecta con su vitalidad. Su paz se vuelve más firme, sus relaciones más maduras, y al ser él mismo resulta más interesante para los demás.",
+ estres:6,estrTxt:"Se vuelve ansioso y preocupado, desconfiado y reactivo. Pierde la calma y puede oscilar entre la obediencia y la rebeldía.",
+ alas:{8:"Más asertivo, práctico y terrenal; puede imponerse cuando hace falta.",1:"Más ordenado, idealista y correcto; con más sentido del deber y algo crítico."},
+ trabajo:"Es el mediador que une al equipo y baja la tensión. Aporta estabilidad, inclusión y una mirada amplia. Necesita plazos claros para no postergar.",
+ familia:"Es a quien todos buscan porque no juzga. Disfruta la siesta, la hamaca y la sobremesa larga. Su desafío es decir lo que quiere sin miedo a romper la armonía.",
+ recs:["Examiná tu tendencia a estar de acuerdo con todos para mantener la paz. ¿Ceder siempre ayuda de verdad?","Esforzate en prestar atención a lo que pasa; no vivas sin rumbo ni te pierdas en fantasías.","Reconocé que también tenés enojo, angustia y otros sentimientos que necesitás manejar.","Si tenés problemas con tu pareja o tus hijos, mirá con honestidad cuál es tu parte.","Hacé ejercicio para conectar con tu cuerpo y tus emociones.","Reprimir lo que sentís puede manifestarse en el cuerpo: dolores de cabeza, de espalda o malestares.","Evitá anestesiarte; tapar la angustia también te quita la capacidad de enfrentarla.","No llegues al final de la vida sin haber vivido la tuya. Preguntate qué querés vos.","Animate a hablar de tus miedos y preocupaciones con tu pareja y tus amigos.","Tu gran don es que la gente se siente aceptada y en paz a tu lado. Te van a querer aún más si también te mostrás tal como sos."]}
+};
+
+const TRIADS = {
+ sentir:{name:"Tríada del Sentir",short:"Sentir",alt:"centro del corazón",types:[2,3,4],
+  txt:"Sus fortalezas y problemas pasan por los sentimientos, la imagen y los vínculos. El 2 sobredesarrolla el sentir (lo expresa de más), el 4 lo subdesarrolla (lo expresa poco) y el 3 es el más fuera de contacto con sus sentimientos.",
+  pos:{2:"Sobredesarrollado",4:"Subdesarrollado",3:"Más fuera de contacto"}},
+ hacer:{name:"Tríada del Hacer",short:"Hacer",alt:"centro de la cabeza",types:[5,6,7],
+  txt:"Sus fortalezas y problemas pasan por la acción y la forma de enfrentar la inseguridad. El 7 sobredesarrolla el hacer, el 5 lo subdesarrolla (piensa en lugar de actuar) y el 6 es el más fuera de contacto con su capacidad de actuar por sí mismo.",
+  pos:{7:"Sobredesarrollado",5:"Subdesarrollado",6:"Más fuera de contacto"}},
+ relacionarse:{name:"Tríada del Relacionarse",short:"Relacionarse",alt:"centro del instinto",types:[8,9,1],
+  txt:"Sus fortalezas y problemas pasan por cómo se vinculan con el entorno y con la autonomía. El 8 sobredesarrolla el relacionarse (se impone), el 1 lo subdesarrolla (necesita justificarse) y el 9 es el más fuera de contacto (se funde con los demás).",
+  pos:{8:"Sobredesarrollado",1:"Subdesarrollado",9:"Más fuera de contacto"}}
+};
+
+const KEY = [[4,6],[8,9],[3,1],[5,7],[2,4],[6,9],[8,1],[2,5],[3,7],[4,9],[5,8],[6,1],[2,3],[4,7],[5,1],[6,8],[9,2],[3,4],[6,7],[2,1],[8,3],[5,9],[6,2],[7,8],[4,1],[9,7],[6,3],[4,5],[8,2],[7,1],[9,3],[5,6],[4,8],[9,1],[7,2],[3,5],[6,4],[9,8],[3,1],[5,7],[2,4],[6,9],[8,1],[5,2],[7,3],[4,9],[5,8],[6,1],[2,3],[4,7],[1,5],[6,8],[2,9],[3,4],[6,7],[2,1],[8,3],[5,9],[2,6],[8,7],[1,4],[7,9],[6,3],[4,5],[2,8],[1,7],[3,9],[5,6],[4,8],[9,1],[7,2],[3,5],[4,6],[8,9],[3,1],[7,5],[4,2],[6,9],[8,1],[5,2],[3,7],[4,9],[5,8],[6,1],[2,3],[4,7],[5,1],[6,8],[8,9],[3,4],[6,7],[2,1],[8,3],[5,9],[2,6],[2,7],[4,1],[7,9],[3,6],[4,5],[2,8],[7,1],[3,9],[5,6],[4,8],[1,9],[2,7],[3,5],[6,4],[8,9],[3,1],[5,7],[2,4],[9,6],[8,1],[2,5],[3,7],[4,9],[5,8],[6,1],[2,3],[4,7],[5,1],[6,8],[9,2],[4,3],[7,6],[2,1],[8,3],[5,9],[2,6],[8,7],[4,1],[9,7],[3,6],[5,4],[8,2],[1,7],[3,9],[6,5],[8,4],[9,1],[2,7],[5,3]];
+
+const Q = [
+["Me considero una persona romántica, soñadora y con mucha imaginación.","Me considero una persona práctica, con los pies bien puestos en la tierra."],
+["Si algo no me gusta, lo encaro de frente con la persona.","Prefiero evitar las peleas; no vale la pena hacerse mala sangre."],
+["La gente me ve como alguien con carisma, buen trato y ganas de llegar lejos.","La gente me describe como alguien directo, serio y con ideales firmes."],
+["Me gusta una vida enfocada: pocas cosas, pero bien a fondo.","Me gusta una vida espontánea, con planes de último momento y mucha diversión."],
+["Soy de abrir las puertas de mi casa y siempre estoy sumando amistades nuevas.","Cuido mucho mi mundo privado y no me mezclo con cualquiera."],
+["Me pongo nervioso o me enojo con relativa facilidad.","Es difícil hacerme enojar; tomo las cosas con calma, tranquilo nomás."],
+["Soy alguien que se hizo a sí mismo, a pulmón y sin esperar nada de nadie.","Soy alguien guiado por ideales y valores muy altos."],
+["Demuestro mi cariño abiertamente: abrazos, mensajes, detalles.","Prefiero mantener cierta distancia con la gente, aunque la aprecie."],
+["Ante algo nuevo, me pregunto si me va a servir y si es eficiente.","Ante algo nuevo, me pregunto si va a ser divertido y si lo voy a disfrutar."],
+["Mi problema es que me centro demasiado en lo que yo siento.","Mi problema es que me centro demasiado en los demás y me olvido de mí."],
+["La gente acude a mí por mi forma de entender las cosas y por lo que sé.","La gente acude a mí porque soy firme y sé tomar decisiones."],
+["A veces doy la impresión de dudar demasiado de mí mismo.","A veces doy la impresión de estar demasiado seguro de tener la razón."],
+["Me importan más las personas y los vínculos que alcanzar metas.","Me importan más las metas y los resultados que los vínculos."],
+["Me cuesta expresarme; me guardo mucho de lo que siento.","Digo las cosas sin vueltas y con chispa, lo que otros no se animan a decir."],
+["Me cuesta dejar de analizar opciones y decidirme por una.","Me cuesta relajarme y ser más flexible con cómo se hacen las cosas."],
+["Suelo postergar y prefiero que otro tome la iniciativa.","Suelo tomar la iniciativa y llevar la batuta."],
+["Me trajo problemas no involucrarme lo suficiente con la gente.","Me trajo problemas querer que los demás dependan de mí."],
+["Puedo dejar de lado lo que siento para cumplir bien con mi trabajo.","Necesito procesar lo que siento antes de poder ponerme a trabajar."],
+["Soy precavido y metódico: mejor prevenir que lamentar.","Me tira el riesgo y la aventura: la vida es una sola."],
+["Me entrego a los demás y disfruto estar rodeado de gente.","Soy reservado y serio; me gusta conversar a fondo los problemas."],
+["Muchas veces siento que tengo que ser el pilar fuerte de mi familia o de mi equipo.","Muchas veces siento que tengo que hacer todo impecable para que se note lo que valgo."],
+["Me atraen las preguntas difíciles y cuido mucho mi independencia.","Me interesa sobre todo mantener mi estabilidad y mi paz interior."],
+["A veces soy demasiado desconfiado y duro.","A veces soy demasiado sentimental y blando."],
+["Me preocupa perderme las cosas buenas de la vida.","Me preocupa que se aprovechen de mí si bajo la guardia."],
+["Mi forma de ser tan reservada a veces molesta a los demás.","Mi costumbre de decirle a la gente cómo hacer las cosas a veces molesta."],
+["Cuando tengo problemas, sigo adelante con paciencia hasta que se resuelven.","Cuando tengo problemas, me doy un gusto: una salida, una comida rica, algo que me levante."],
+["Dependo de mis amigos y ellos saben que pueden contar conmigo; es puro jopói.","No dependo de nadie; prefiero arreglármelas solo."],
+["Soy de cambiar de humor y quedarme en mi mundo.","Soy más bien desapegado; observo desde afuera."],
+["Me divierte desafiar a la gente y ver cómo reacciona.","Me gusta consolar y tranquilizar a los demás."],
+["Soy sociable y extrovertido: el alma de la ronda de tereré.","Soy disciplinado y formal."],
+["Me da vergüenza mostrar lo que sé hacer.","Me gusta que la gente sepa lo que hago bien."],
+["Prefiero desarrollar mis propios intereses antes que tener seguridad y comodidad.","Prefiero tener seguridad y estabilidad, como un trabajo fijo, antes que arriesgar por mis intereses."],
+["Tiendo a alejarme de los conflictos con la gente.","Rara vez me achico ante un conflicto."],
+["Cedo con facilidad y a veces dejo que los demás decidan por mí.","A veces soy demasiado exigente e intransigente con los demás."],
+["Me valoran por mi buena onda y un sentido del humor a prueba de todo.","Me valoran por mi generosidad y por estar, en silencio, cuando me necesitan."],
+["Gran parte de mis logros vienen de saber causar una buena impresión.","Logré mis cosas a pesar de que el trato social no es lo mío."],
+["Me enorgullece ser constante y tener sentido común.","Me enorgullece ser original y creativo."],
+["En el fondo soy tranquilo, amable y me adapto fácil.","En el fondo soy firme, directo y práctico."],
+["Me esfuerzo mucho para caer bien y ser aceptado.","Ser aceptado o querido nunca fue mi prioridad; prefiero hacer lo correcto."],
+["Cuando me presionan, me retraigo y me alejo.","Cuando me presionan, salto y me pongo a la defensiva."],
+["La gente se me acerca porque soy cálido y me involucro con cada uno.","La gente se me acerca porque soy tranquilo, distinto y profundo."],
+["El deber y la responsabilidad son valores centrales para mí.","La armonía y llevarse bien con todos son valores centrales para mí."],
+["Motivo a la gente con planes grandes y una visión ambiciosa.","Motivo a la gente explicando qué pasará si las cosas no se hacen bien."],
+["Rara vez muestro mucho mis emociones.","Suelo ser muy expresivo con lo que siento."],
+["Los detalles no son mi fuerte; me aburren.","Tengo buena mano para cuidar los detalles."],
+["Suelo remarcar lo distinto que soy de mis amigos.","Suelo remarcar todo lo que tengo en común con mis amigos."],
+["Cuando las cosas se calientan, me quedo al margen mirando.","Cuando las cosas se calientan, me meto y las enfrento."],
+["Banco a mis amigos aunque estén equivocados.","No transijo con lo que considero correcto, ni siquiera por un amigo."],
+["Soy más de acompañar con buena intención que de liderar.","Soy ambicioso y muy motivado."],
+["Le doy vueltas y vueltas a mis problemas hasta que los suelto.","Me distraigo con otras cosas hasta que veo cómo resolver el problema."],
+["Tengo convicciones fuertes sobre cómo deberían ser las cosas.","Suelo cuestionar y dudar de que las cosas sean como parecen."],
+["Tuve roces con la gente por ser pesimista y quejarme mucho.","Tuve roces con la gente por ser demasiado controlador y exigente."],
+["Actúo según lo que siento, y que pase lo que tenga que pasar.","Prefiero no dejarme llevar por lo que siento, para no complicar las cosas."],
+["Me siento cómodo siendo el centro de atención.","No me siento cómodo siendo el centro de atención."],
+["Soy precavido: trato de estar preparado para cualquier imprevisto.","Soy espontáneo: resuelvo los problemas sobre la marcha."],
+["Me molesta cuando no valoran todo lo que hago por ellos.","Me molesta cuando no escuchan lo que tengo para decir."],
+["Para mí es clave mantener mi independencia y confiar en mí mismo.","Para mí es clave sentirme valorado y admirado."],
+["Cuando discuto con amigos, defiendo mis ideas con argumentos hasta el final.","Cuando discuto con amigos, dejo que las aguas se calmen solas para no generar malestar."],
+["A veces soy posesivo con las personas que quiero.","A veces pongo a prueba a mis seres queridos para ver si de verdad están conmigo."],
+["Mi fuerte es organizar recursos y hacer que las cosas avancen.","Mi fuerte es crear ideas nuevas y entusiasmar a otros con ellas."],
+["Soy riguroso y duro conmigo mismo.","Soy muy emotivo y no tan disciplinado."],
+["Busco una vida dinámica, intensa y llena de emociones.","Busco una vida estable, constante y tranquila."],
+["Me cuesta hacer grandes cambios porque me aferro a lo conocido.","Hago grandes cambios con facilidad; me reinvento cuando hace falta."],
+["Le doy mucho peso a mis sentimientos y me quedo con ellos por mucho tiempo.","Le resto importancia a mis sentimientos y no les presto mucha atención."],
+["Atendí y apoyé a mucha gente.","Dirigí y motivé a mucha gente."],
+["Soy demasiado serio y estricto conmigo mismo.","Soy demasiado permisivo conmigo mismo; me doy todos los gustos."],
+["Soy decidido y siempre busco superarme.","Soy modesto y me conformo con ir a mi propio ritmo, despacito."],
+["Me enorgullece ser objetivo y claro.","Me enorgullece ser comprometido y alguien de confianza."],
+["Dedico mucho tiempo a entender lo que mis emociones me quieren decir.","Estar pendiente de los sentimientos es perder el tiempo; lo que importa es hacer."],
+["Me veo como alguien alegre y despreocupado.","Me veo como alguien serio y correcto."],
+["Me caracteriza una mente rápida y una energía que no se acaba.","Me caracteriza mi entrega y lo mucho que me preocupo por los demás."],
+["Elijo actividades que me den algún reconocimiento o premio.","Elijo lo que de verdad me interesa, aunque no me dé reconocimiento."],
+["Cumplir con los compromisos sociales, como cumpleaños, velorios o casamientos, no es mi prioridad.","Me tomo muy en serio cumplir con los compromisos sociales: cumpleaños, velorios, casamientos."],
+["Casi siempre prefiero hacerme cargo de la situación.","Casi siempre prefiero que otro se haga cargo."],
+["Mis valores y mi estilo de vida cambiaron varias veces a lo largo de los años.","Mis valores y mi estilo de vida se mantuvieron firmes y coherentes."],
+["No soy muy autodisciplinado.","No estoy muy en contacto con la gente."],
+["Me siento vulnerable cuando estoy rodeado de mucha gente.","Siento que mis sacrificios se dan por sentados."],
+["Tiendo a pensar que lo peor puede pasar.","Tiendo a pensar que al final todo se acomoda."],
+["La gente confía en mí porque soy reservado y protejo sus intereses.","La gente confía en mí porque soy justo y hago lo correcto."],
+["Me meto tanto en mis proyectos que a veces me aíslo de los demás.","Me involucro tanto con los demás que descuido mis propios proyectos."],
+["Cuando me presentan a alguien, me muestro sereno y seguro.","Cuando me presentan a alguien, soy cálido y divertido; rompo el hielo enseguida."],
+["En general tiendo a ser pesimista.","En general tiendo a ser optimista."],
+["Prefiero quedarme en mi propio mundo.","Prefiero mostrarle al mundo quién soy."],
+["Lo que más me afecta es el nerviosismo, la inseguridad y la duda.","Lo que más me afecta es la impaciencia y querer que todo sea perfecto."],
+["A veces soy demasiado cercano e íntimo con la gente.","A veces soy demasiado frío y reservado con la gente."],
+["Me perdí oportunidades por no sentir que tenía que aprovecharlas.","Me perdí oportunidades por querer abarcar demasiadas a la vez."],
+["Me cuesta arrancar con las cosas.","Suelo arrancar las cosas enseguida."],
+["Me cuesta decidirme.","Rara vez me cuesta decidir."],
+["Tiendo a imponerme demasiado.","Tiendo a no imponerme lo suficiente."],
+["Hago lo posible por conocer gente nueva y hacer contactos.","No me esfuerzo demasiado por conocer gente nueva."],
+["Cuando no sé qué hacer, busco el consejo de alguien de confianza.","Cuando no sé qué hacer, pruebo distintas cosas a ver cuál funciona."],
+["Me da miedo quedarme afuera de los planes de los demás.","Me da miedo que los asuntos de los demás me distraigan de lo que tengo que hacer."],
+["Cuando me enojo, lo digo.","Cuando me enojo, me pongo distante."],
+["Me cuesta conciliar el sueño.","Me duermo con facilidad, hasta en la hamaca."],
+["Busco la forma de estar más cerca de las personas.","Trato de entender qué esperan los demás de mí."],
+["En una charla soy más de escuchar con atención y cuidar lo que digo.","En una charla soy entusiasta, conversador y ocurrente."],
+["Muchas veces me callo cuando veo que otros se equivocan.","Muchas veces ayudo a los demás a ver en qué se equivocan."],
+["Soy temperamental, de humor cambiante.","Soy tranquilo; por dentro casi nunca hay tormenta."],
+["Si alguien no me cae bien, igual trato de ser cordial.","Si alguien no me cae bien, se lo hago notar de alguna forma."],
+["Muchos de mis problemas con la gente vienen de mi sensibilidad.","Muchos de mis problemas con la gente vienen de que parezco desinteresado."],
+["Soy de salir corriendo a rescatar a los demás.","Soy de enseñarles a los demás a valerse por sí mismos."],
+["Me gusta soltarme y llevar las cosas al límite.","No me gusta perder el control."],
+["Me enfoco demasiado en hacer las cosas mejor que los demás.","Me enfoco demasiado en hacer las cosas bien para los demás."],
+["Mis pensamientos suelen ser especulativos; dejo volar la imaginación.","Mis pensamientos suelen ser prácticos, para conseguir resultados."],
+["Sé describir muy bien lo que pasa por dentro.","Sé hacerme cargo de las situaciones."],
+["Hago lo necesario para que las cosas salgan bien, aunque a otros no les guste.","No me gusta que me presionen, así que tampoco presiono a nadie."],
+["Me enorgullece ser importante en la vida de los demás.","Me enorgullece mi gusto por vivir experiencias nuevas."],
+["Me doy cuenta de que a veces doy la imagen de ser alguien admirable.","Me doy cuenta de que a veces doy la imagen de ser alguien raro."],
+["Generalmente hago lo que tengo que hacer.","Generalmente hago lo que quiero hacer."],
+["Me gustan las situaciones difíciles y de mucha presión.","No me gusta estar en situaciones difíciles y de mucha presión."],
+["Me enorgullece ser flexible: lo importante cambia según la situación.","Me enorgullece mantener mis principios: soy firme y coherente."],
+["Mi estilo de vida es sobrio y austero.","Mi estilo de vida tiende al exceso y a estar siempre en movimiento."],
+["Mi deseo de ayudar a otros afectó mi propia salud.","Mi deseo de atender mis necesidades afectó mis relaciones."],
+["A veces soy demasiado abierto e ingenuo.","A veces soy demasiado cauteloso y reservado."],
+["A veces molesto a la gente por ser demasiado agresivo.","A veces molesto a la gente por ser demasiado severo y rígido."],
+["Una de mis prioridades es atender las necesidades de los demás.","Una de mis prioridades es buscar formas distintas de ver y hacer las cosas."],
+["No suelo alterarme mucho.","Tengo cambios de ánimo fuertes."],
+["Me atraen las situaciones que me hacen sentir emociones intensas.","Me atraen las situaciones que me hacen sentir tranquilo y cómodo."],
+["Me importa más seguir mis intereses que conseguir resultados prácticos.","Me importa más conseguir resultados prácticos que seguir mis intereses."],
+["Tengo una gran necesidad de pertenecer a un grupo, a mi gente.","Tengo una gran necesidad de sentirme en equilibrio."],
+["En mis relaciones, a veces pedí demasiada cercanía.","En mis relaciones, a veces mantuve demasiada distancia."],
+["Tiendo a revivir sentimientos del pasado.","Tiendo a adelantarme a lo que viene."],
+["Siento que los demás son invasivos y exigentes.","Siento que los demás son desorganizados e irresponsables."],
+["No confío mucho en mí mismo.","Solo confío en mí mismo."],
+["Probablemente fui demasiado pasivo y poco comprometido.","Probablemente fui demasiado controlador y manipulador."],
+["Las dudas sobre mí mismo a menudo me paralizan.","Casi nunca dejo que las dudas se interpongan en mi camino."],
+["Entre lo conocido y lo nuevo, elijo lo nuevo.","Prefiero lo que ya sé que me gusta: ¿para qué arriesgar?"],
+["Uso mucho el contacto físico para mostrar cariño: abrazo, beso, palmada.","Siento que el cariño sincero no necesita tanto contacto físico."],
+["Cuando tengo que enfrentar a alguien, a veces me paso de duro.","Cuando tengo que enfrentar a alguien, a veces me voy por las ramas."],
+["Me atraen temas que a otros les parecen inquietantes o perturbadores.","Prefiero no gastar tiempo en temas pesados o perturbadores."],
+["Ser metido o entrometido me trajo problemas.","Ser evasivo y poco comunicativo me trajo problemas."],
+["Me preocupa no tener los recursos para cuidar a los míos.","Me preocupa no tener la disciplina para enfocarme en lo que quiero."],
+["Soy individualista e intuitivo.","Soy responsable y organizado."],
+["Uno de mis grandes desafíos es vencer la inercia y arrancar.","Uno de mis grandes desafíos es bajar un cambio."],
+["Cuando me siento inseguro, me pongo arrogante o despectivo.","Cuando me siento inseguro, me pongo discutidor y a la defensiva."],
+["Estoy abierto a probar enfoques nuevos.","Estoy dispuesto a abrirme y compartir lo que siento."],
+["Me muestro más duro de lo que realmente soy.","Me muestro más preocupado por los demás de lo que realmente estoy."],
+["Me guío por la conciencia y la razón.","Me guío por lo que siento y por mis impulsos."],
+["La adversidad me hizo más fuerte y decidido.","La adversidad me dejó más resignado y desanimado."],
+["Siempre me aseguro de tener un respaldo, un plan B.","Prefiero depender de lo menos posible."],
+["Tuve que ser fuerte para los demás y no me quedó tiempo para mis sentimientos.","Me costó tanto lidiar con mis sentimientos que no pude ser el sostén de otros."],
+["Muchas veces me pregunto por qué la gente se fija tanto en lo negativo.","Muchas veces me pregunto cómo la gente puede estar tan tranquila con todo lo que está mal."],
+["Trato de que no me vean como alguien egoísta.","Trato de que no me vean como alguien aburrido."],
+["Me da miedo que las necesidades de los demás me sobrepasen.","Me da miedo no estar a la altura de lo que esperan de mí."]
+];
+
+const ORDER = [1,2,3,4,5,6,7,8,9];
+const MILESTONES = {
+ 24:"¡Buen arranque! Ya hiciste un sexto del camino.",
+ 48:"Un tercio listo. Si querés, tomate un tereré: tu avance queda guardado.",
+ 72:"¡Mitad del camino! Vas muy bien.",
+ 96:"Dos tercios. Ya te falta menos de lo que hiciste.",
+ 120:"¡Últimas 24! Ya casi conocés tu tipo."
+};
+const PECADOS = [
+ [1,"Ira","Ira","Serenidad"],[2,"Orgullo (soberbia)","Orgullo","Humildad"],[3,"Vanidad","Engaño","Verdad"],
+ [4,"Envidia","Envidia","Armonía (ecuanimidad)"],[5,"Avaricia","Avaricia","Desapego (desinterés)"],[6,"Miedo","Miedo","Valor"],
+ [7,"Gula","Destemplanza","Sobriedad"],[8,"Lujuria","Arrogancia","Sencillez (inocencia)"],[9,"Pereza","Pereza","Diligencia (acción)"]
+];
+
+/* ======================= ESTADO ======================= */
+const LS_PROGRESS = "eneagrama.progress.v2";
+const LS_HISTORY = "eneagrama.history.v2";
+const store = {
+  get(k, fb){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; }catch(e){ return fb; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+// migrar resultados de la versión anterior, si existen
+(function(){ const old = store.get("cheReko.history.v1", null); if (old && old.length && !store.get(LS_HISTORY, null)) store.set(LS_HISTORY, old); })();
+
+let state = { name:"", answers:new Array(144).fill(null), idx:0 };
+let current = null;
+let showArrows = true;
+let libType = 1, detType = 1;
+
+const $ = s => document.querySelector(s);
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const tColor = t => cssVar("--t"+t);
+const tVar = t => `var(--t${t})`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const wingsOf = t => [t === 1 ? 9 : t-1, t === 9 ? 1 : t+1];
+const badge = t => `<span class="badge" style="background:${tVar(t)}">${t}</span>`;
+
+/* ======================= CONTENIDO GENERAL ======================= */
+function learnHTML(){
+  const triadRows = ["sentir","hacer","relacionarse"].map(k => {
+    const T = TRIADS[k];
+    const over = Object.keys(T.pos).find(x => T.pos[x]==="Sobredesarrollado");
+    const under = Object.keys(T.pos).find(x => T.pos[x]==="Subdesarrollado");
+    const out = Object.keys(T.pos).find(x => T.pos[x]==="Más fuera de contacto");
+    return `<tr><td><b>${T.name}</b><br><span class="muted">${T.alt}</span></td><td>${badge(over)} ${TYPES[over].name}</td><td>${badge(under)} ${TYPES[under].name}</td><td>${badge(out)} ${TYPES[out].name}</td></tr>`;
+  }).join("");
+  const lvlHead = ORDER.map(t => `<th><span class="n" style="background:${tVar(t)}">${t}</span></th>`).join("");
+  const lvlRows = [0,1,2,3,4,5,6,7,8].map(i => {
+    const zone = i<3 ? "Sano" : i<6 ? "Promedio" : "Malsano";
+    return `<tr><td><b>${i+1}</b> <span class="muted">${zone}</span></td>${ORDER.map(t => `<td>${esc(TYPES[t].niveles[i])}</td>`).join("")}</tr>`;
+  }).join("");
+  const pecRows = PECADOS.map(([t,p,v,vi]) => `<tr><td><span class="n" style="background:${tVar(t)}">${t}</span> ${TYPES[t].name}</td><td>${p}</td><td>${v}</td><td>${vi}</td></tr>`).join("");
+  const sections = [
+   ["intro","¿Qué es el eneagrama?","historia, propósito y objetivo",`
+     <p>La palabra viene del griego <em>ennea</em>, nueve, y <em>grama</em>, figura: una estrella de nueve puntas dentro de un círculo. Según la tradición, el símbolo tiene unos dos mil años y se transmitió en secreto, de forma oral, en círculos sufíes de Asia Central. Lo que conocemos en Occidente empezó con George Gurdjieff. Más tarde, el boliviano Óscar Ichazo lo enseñó en Chile y en Estados Unidos; Claudio Naranjo, Helen Palmer y otros lo llevaron a la psicología, y en 1971 se presentó públicamente en la Universidad Loyola de Chicago.</p>
+     <h4>Para qué sirve</h4>
+     <p>El propósito es descubrir a qué tipo pertenecemos y, con eso, reconocer nuestra <b>compulsión</b>: una fuerza automática que nos hace reaccionar siempre igual, sobre todo cuando no la vemos. Se forma en la infancia a partir de mensajes que nos quedaron grabados, como “nunca confíes en nadie”, “lo importante es no mostrar lo que sentís”, “no merezco que me quieran” o “la vida es dura”. Esas programaciones nos impiden ser quienes realmente somos.</p>
+     <p>Descubrirla rompe la estrategia de defensa que armamos para sentirnos seguros. Mientras no la enfrentamos, decide por nosotros. Por eso el eneagrama es un viaje de autoconocimiento hacia la libertad, la sanación y, para quien lo vive desde la fe, un mayor acercamiento a Dios.</p>
+     <h4>Objetivo</h4>
+     <p>Descubrir tu tipo te da una perspectiva nueva de vos y de los demás: conocer tus límites y tus recursos, muchas veces inconscientes, para seguir tu desarrollo personal de forma más consciente, y entender mejor a la gente que te rodea.</p>
+     <h4>Los nueve tipos en una línea</h4>
+     <ul>${ORDER.map(t => `<li><b>${t}. ${TYPES[t].name}</b>: ${esc(TYPES[t].rasgos)}</li>`).join("")}</ul>
+     <h4>Principios importantes</h4>
+     <ul>
+      <li>Ningún tipo es mejor ni peor. Cada uno tiene fortalezas y límites propios; si algunos son más valorados es por lo que premia la sociedad, no porque valgan más.</li>
+      <li>Todos los tipos tienen cualidades hermosas en su nivel sano y sombras que se desbordan en el nivel malsano.</li>
+      <li>El tipo básico no cambia a lo largo de la vida. Lo que cambia es el nivel en el que vivimos.</li>
+      <li>Las descripciones valen igual para hombres y mujeres.</li>
+      <li>El tipo se forma hacia los 4 o 5 años, como resultado del temperamento y de la relación con los padres y personas cercanas.</li>
+      <li>No todo lo de tu tipo se aplica siempre: fluctuamos entre rasgos sanos, promedio y malsanos.</li>
+     </ul>`],
+   ["estructura","La estructura del símbolo","círculo, triángulo y hexagrama",`
+     <p>En el círculo hay nueve puntos a la misma distancia, numerados del 1 al 9, con el 9 arriba. Cada punto es un tipo básico de personalidad. Las líneas interiores muestran cómo se relacionan entre sí.</p>
+     <ul><li>Los puntos <b>3, 6 y 9</b> forman un triángulo equilátero.</li><li>Los otros seis forman un hexagrama irregular en este orden: <b>1, 4, 2, 8, 5, 7</b> y de vuelta al 1.</li></ul>
+     <p>No hay dos personas iguales, pero sí semejanzas profundas entre las del mismo tipo. Para reconocer un tipo no alcanza con un rasgo aislado: hay que mirar el conjunto, el estilo de vida y las motivaciones de fondo. Requiere práctica, observación y mente abierta, así que no te desanimes si al principio te cuesta.</p>`],
+   ["triadas","Las tres tríadas","Sentir, Hacer y Relacionarse",`
+     <p>En el nivel más simple, el eneagrama agrupa los nueve tipos en tres tríadas. Todos tenemos la capacidad de sentir, hacer y relacionarnos, pero durante la infancia le damos más peso a una de ellas, y eso marca nuestro tipo.</p>
+     <p>Dentro de cada tríada, un tipo <b>sobredesarrolla</b> esa facultad, otro la <b>subdesarrolla</b> y el tercero está <b>más fuera de contacto</b> con ella:</p>
+     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tríada</th><th>Sobredesarrollado</th><th>Subdesarrollado</th><th>Más fuera de contacto</th></tr></thead><tbody>${triadRows}</tbody></table></div>
+     <ul>${["sentir","hacer","relacionarse"].map(k => `<li><b>${TRIADS[k].name}:</b> ${TRIADS[k].txt}</li>`).join("")}</ul>
+     <p>Los tipos del triángulo, <b>3, 6 y 9</b>, se llaman <b>primarios</b>: son los más bloqueados en la facultad de su tríada. Los otros seis son <b>secundarios</b>, más mezclados y menos desconectados.</p>`],
+   ["ala","El ala","el segundo lado de tu personalidad",`
+     <p>Nadie es un tipo “puro”. Cada persona es una mezcla única de su tipo básico y de uno de sus dos vecinos en el círculo, que se llama <b>ala</b>. El tipo básico domina; el ala lo complementa y le agrega rasgos importantes, a veces contradictorios.</p>
+     <p>Por ejemplo, un 9 tendrá ala 8 o ala 1, y se entiende mejor mirando la mezcla de rasgos del 9 con los del 8 o del 1. En el test, el ala es la más alta de las dos barras vecinas a tu tipo básico, pero la mejor forma de confirmarla es leer las dos descripciones posibles y ver cuál te describe mejor.</p>`],
+   ["direcciones","Integración y desintegración","hacia dónde vas cuando crecés o te deteriorás",`
+     <p>Los tipos no son categorías fijas: permiten crecer o deteriorarse. Las líneas del símbolo marcan dos movimientos para cada tipo:</p>
+     <ul>
+      <li><b style="color:var(--good)">Dirección de integración</b> (salud, autorrealización): 1 hacia 7, 7 hacia 5, 5 hacia 8, 8 hacia 2, 2 hacia 4, 4 hacia 1; y en el triángulo, 3 hacia 6, 6 hacia 9, 9 hacia 3. Al integrarte incorporás los rasgos <b>sanos</b> del tipo al que vas.</li>
+      <li><b style="color:var(--warn)">Dirección de desintegración</b> (estrés, neurosis): 1 hacia 4, 4 hacia 2, 2 hacia 8, 8 hacia 5, 5 hacia 7, 7 hacia 1; y 3 hacia 9, 9 hacia 6, 6 hacia 3. Al deteriorarte tomás los rasgos <b>malsanos</b> del tipo al que vas.</li>
+     </ul>
+     <p>Son metáforas de procesos psicológicos, no saltos literales. Ejemplo: el 6 sano va al 9 y se vuelve relajado, aceptante y pacífico; el 6 muy malsano va al 3 y compensa su inseguridad volviéndose arrogante y agresivo. A veces aparecen señales tempranas: un 6 promedio puede tener momentos de arrogancia antes de deteriorarse de verdad.</p>
+     <p>Solo desde el extremo sano de tu tipo podés integrarte, y solo desde el extremo malsano te desintegrás: ambos son procesos que llevan tiempo. Para tener el cuadro completo tenés que considerar cuatro tipos: el básico, el ala y los dos de tus direcciones. La meta final es dar la vuelta completa al eneagrama e integrar lo sano de todos los tipos: lo que importa no es con qué tipo empezás, sino qué hacés con él.</p>`],
+   ["niveles","Niveles de desarrollo","el continuo de rasgos de cada tipo",`
+     <p>Cada tipo tiene nueve niveles de desarrollo: tres sanos, tres promedio y tres malsanos. Para entender a una persona hay que ver no solo su tipo y su ala, sino en qué nivel se encuentra. Cambiamos todo el tiempo, a veces para bien y a veces para mal, pero siempre dentro del espectro de nuestro tipo. Podemos aprender a ser sanos, igual que aprendimos a ser malsanos.</p>
+     <div class="tbl-wrap"><table class="tbl" style="min-width:980px"><thead><tr><th>Nivel</th>${lvlHead}</tr></thead><tbody>${lvlRows}</tbody></table></div>`],
+   ["pecados","Pecados capitales, pasiones y virtudes","la sombra y la luz de cada tipo",`
+     <p>A cada tipo le corresponde una <b>pasión</b> o pecado capital, que es su sombra emocional, y una <b>virtud</b>, que es su camino de crecimiento. A los siete pecados capitales de la tradición cristiana (soberbia, avaricia, lujuria, ira, gula, envidia y pereza), el eneagrama suma el miedo y la vanidad. La guía original usa dos listas: las pasiones de Claudio Naranjo y una lista de vicios con matices propios.</p>
+     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tipo</th><th>Pasión capital (Naranjo)</th><th>Vicio (guía)</th><th>Virtud</th></tr></thead><tbody>${pecRows}</tbody></table></div>`],
+   ["sugerencias","Sugerencias para el cambio","motivación y el ejercicio de detenerse",`
+     <p>Para cambiar tenemos que desearlo. La mayoría encuentra un equilibrio tolerable entre felicidad e infelicidad y no cambia hasta que es imprescindible. Todos tenemos cierta inercia psíquica; nos protege de cambiar por cualquier cosa, pero solemos resistirnos mucho más de lo necesario por miedo a lo desconocido y, en el fondo, por miedo a ser verdaderamente libres.</p>
+     <h4>Dos motores del cambio</h4>
+     <ul><li><b>El deseo</b> de lo que es bueno para nosotros.</li><li><b>El temor</b> a las consecuencias de seguir igual. Por eso las descripciones de los niveles malsanos son duras: el sufrimiento llama la atención.</li></ul>
+     <p>El temor solo no alcanza: además de ver al león, hay que encontrar la puerta de la jaula. Las fortalezas de tu tipo y tu dirección de integración muestran esa salida.</p>
+     <h4>El ejercicio de detenerse</h4>
+     <p>Gurdjieff pedía de golpe a sus alumnos que se quedaran inmóviles en medio de lo que hacían, para que tomaran conciencia de sus hábitos. Podés hacer lo mismo: cada vez que te descubras en un pensamiento o conducta negativa, ordenate “¡alto!”. Entendé por qué apareció, no lo sigas alimentando ni te castigues por tenerlo, y volvé tu atención a lo que pasa en este momento. Te vas a sorprender de cuántos pensamientos negativos, enojados o resentidos tenemos al día, reflejo del vicio de nuestro tipo. Si les negás atención, pierden poder. Vos no sos tus pensamientos ni tus emociones pasajeras.</p>
+     <h4>El eneagrama te ayuda de tres maneras</h4>
+     <ol><li>A identificar tus fortalezas y debilidades.</li><li>A ver con claridad el costo de inflar el ego y alejarte del crecimiento.</li><li>A saber que existe una forma más positiva de vivir.</li></ol>
+     <p>Conocerse no alcanza para cambiar: si así fuera, los más eruditos serían las mejores personas. El conocimiento es un medio; el cambio pide valor para desear lo que es bueno para nosotros y no rendirnos ante el miedo. Avanzamos o retrocedemos, pero nunca nos quedamos iguales.</p>`],
+   ["cierre","Para cerrar","ser plenamente humanos",`
+     <p>El eneagrama no promete perfección ni pide que nos alejemos del mundo. Por más sanos que lleguemos a ser, siempre seremos incompletos y limitados. El desafío es llegar a ser plenamente humanos.</p>
+     <p>Una vida plena nos convierte en una paradoja: libres pero sujetos a la necesidad; astutos pero inocentes; abiertos a los demás pero confiados en nosotros mismos; fuertes pero capaces de ceder; centrados en valores altos pero capaces de aceptar la imperfección; realistas ante el sufrimiento pero agradecidos por la vida tal como es.</p>
+     <p>Las personas más grandes de la historia coinciden en que la mejor forma de realizarnos es trascendernos: salir del egocentrismo para hacer lugar a los demás.</p>`]
+  ];
+  return sections.map(([id,title,hint,body],i) => `<details class="acc" id="learn-${id}"${i===0?" open":""}><summary>${title} <span class="hint">${hint}</span></summary><div class="acc-body">${body}</div></details>`).join("");
+}
+
+/* ======================= DIBUJO ÑANDUTÍ ======================= */
+const NS = "http://www.w3.org/2000/svg";
+const C = 200, R = 150;
+function ptPos(t, r){ const a = (-90 + (t % 9) * 40) * Math.PI/180; return [C + r*Math.cos(a), C + r*Math.sin(a)]; }
+function el(name, attrs, parent){ const e = document.createElementNS(NS, name); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function drawNanduti(svg, opts){
+  opts = opts || {};
+  svg.innerHTML = "";
+  const anim = !!opts.animate;
+  const g = el("g", {}, svg);
+  for (let r = 30; r <= 180; r += 30) el("circle", {cx:C, cy:C, r, class:"nd-thread"+(anim?" draw":""), pathLength:1, "stroke-width": r===180?2:1}, g);
+  for (let i = 0; i < 36; i++){ const a = i*10*Math.PI/180; el("line", {x1:C+12*Math.cos(a), y1:C+12*Math.sin(a), x2:C+180*Math.cos(a), y2:C+180*Math.sin(a), class:"nd-thread"+(anim?" draw":""), pathLength:1, "stroke-width":.8}, g); }
+  for (let i = 0; i < 36; i++){
+    const a1 = i*10*Math.PI/180, a2 = (i+1)*10*Math.PI/180, am = (a1+a2)/2, r1 = 120, r2 = 168;
+    el("path", {d:`M${C+r1*Math.cos(a1)},${C+r1*Math.sin(a1)} Q${C+r2*Math.cos(am)},${C+r2*Math.sin(am)} ${C+r1*Math.cos(a2)},${C+r1*Math.sin(a2)}`, class:"nd-thread"+(anim?" draw d2":""), pathLength:1, "stroke-width":1}, g);
+  }
+  const pathOf = arr => arr.map((t,i)=> (i?"L":"M") + ptPos(t,R).join(",")).join(" ") + " Z";
+  el("path", {d:pathOf([3,6,9]), class:"nd-line"+(anim?" draw d2":""), pathLength:1}, g);
+  el("path", {d:pathOf([1,4,2,8,5,7]), class:"nd-line"+(anim?" draw d2":""), pathLength:1}, g);
+  el("circle", {cx:C, cy:C, r:R, class:"nd-line"+(anim?" draw":""), pathLength:1}, g);
+  if (opts.compare){
+    const pts = ORDER.map(t => ptPos(t, 18 + (R-18)*opts.compare[t]/32).join(",")).join(" ");
+    el("polygon", {points:pts, fill:"none", stroke:cssVar("--muted"), "stroke-width":2.2, "stroke-dasharray":"6 5"}, g);
+  }
+  if (opts.scores){
+    const pts = ORDER.map(t => ptPos(t, 18 + (R-18)*opts.scores[t]/32).join(",")).join(" ");
+    el("polygon", {points:pts, fill:tColor(opts.top), "fill-opacity":.22, stroke:tColor(opts.top), "stroke-width":2.5, "stroke-linejoin":"round"}, g);
+  }
+  if (opts.arrows){
+    const t = opts.arrows, defs = el("defs", {}, svg);
+    [["ag", cssVar("--good")],["as", cssVar("--warn")]].forEach(([id,col])=>{
+      const m = el("marker", {id, viewBox:"0 0 10 10", refX:9, refY:5, markerWidth:7, markerHeight:7, orient:"auto-start-reverse"}, defs);
+      el("path", {d:"M0,0 L10,5 L0,10 z", fill:col}, m);
+    });
+    const line = (a, b, col, mk) => {
+      const [x1,y1] = ptPos(a,R), [x2,y2] = ptPos(b,R); const dx = x2-x1, dy = y2-y1, L = Math.hypot(dx,dy);
+      el("line", {x1:x1+dx*24/L, y1:y1+dy*24/L, x2:x2-dx*26/L, y2:y2-dy*26/L, stroke:col, "stroke-width":3.2, "marker-end":`url(#${mk})`}, g);
+    };
+    line(t, TYPES[t].crece, cssVar("--good"), "ag");
+    line(t, TYPES[t].estres, cssVar("--warn"), "as");
+  }
+  const ptsG = el("g", {}, svg);
+  for (const t of ORDER){
+    const [x,y] = ptPos(t, R);
+    const p = el("g", {class:"nd-pt"+(anim?" pop":""), "data-t":t, transform:`translate(${x},${y})`}, ptsG);
+    if (anim) p.style.animationDelay = (1.4 + t*0.08) + "s";
+    if (opts.interactive){ p.setAttribute("tabindex","0"); p.setAttribute("role","button"); p.setAttribute("aria-label", `Tipo ${t}: ${TYPES[t].name}`); }
+    el("circle", {r:27, class:"ring", stroke:tColor(t)}, p);
+    el("circle", {r:20, class:"dot", fill:tColor(t)}, p);
+    const tx = el("text", {"text-anchor":"middle", dy:"6"}, p); tx.textContent = t;
+    if (opts.scores){
+      const [lx,ly] = ptPos(t, R+40);
+      const lab = el("text", {x:lx-x, y:ly-y+4, "text-anchor":"middle", class:"nd-label"}, p);
+      lab.textContent = opts.scores[t]; lab.style.fill = "var(--ink)"; lab.style.fontWeight = "700"; lab.style.fontSize = "14px";
+    }
+  }
+}
+
+/* ======================= EXPLORADOR ======================= */
+let exploreSel = 9, exploreTriad = "all";
+function renderExplorer(){
+  const svg = $("#exploreSvg");
+  drawNanduti(svg, {interactive:true});
+  svg.querySelectorAll(".nd-pt").forEach(p => {
+    const t = +p.dataset.t;
+    if (t === exploreSel) p.classList.add("sel");
+    if (exploreTriad !== "all" && !TRIADS[exploreTriad].types.includes(t)) p.classList.add("dim");
+    const pick = () => { exploreSel = t; renderExplorer(); svg.querySelector(`.nd-pt[data-t="${t}"]`).focus(); };
+    p.addEventListener("click", pick);
+    p.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); pick(); } });
+  });
+  const T = TYPES[exploreSel], TR = TRIADS[T.triada];
+  const panel = $("#explorePanel");
+  panel.style.setProperty("--tc", tVar(exploreSel));
+  panel.innerHTML = `
+    <div class="num">${exploreSel}</div>
+    <h3 style="font-size:1.7rem">${T.name}</h3>
+    <p class="muted" style="margin:.1em 0 0;font-size:.95rem">${esc(T.alias)}</p>
+    <p class="lema">“${esc(T.lema)}”</p>
+    <p style="font-size:.98rem">${esc(T.rasgos)}</p>
+    <dl class="kv">
+      <dt>Tríada</dt><dd>${TR.short}: ${esc(T.triadaPos.toLowerCase())}</dd>
+      <dt>Busca</dt><dd>${esc(T.deseo)}</dd>
+      <dt>Teme</dt><dd>${esc(T.miedo)}</dd>
+      <dt>Pecado capital</dt><dd>${esc(T.pasion.nombre)}</dd>
+      <dt>Virtud</dt><dd>${esc(T.virtud.nombre)}</dd>
+      <dt>Integración</dt><dd>hacia el ${T.crece} (${TYPES[T.crece].name})</dd>
+      <dt>Desintegración</dt><dd>hacia el ${T.estres} (${TYPES[T.estres].name})</dd>
+    </dl>
+    <button class="btn small" id="openLib">Ver ficha completa del ${exploreSel}</button>`;
+  $("#openLib").addEventListener("click", () => { libType = exploreSel; renderLibrary(); $("#biblioteca").scrollIntoView({behavior:"smooth"}); });
+  $("#triadText").textContent = exploreTriad === "all" ? "Los nueve tipos se agrupan en tres tríadas según la facultad que más marcó su desarrollo: sentir, hacer o relacionarse." : TRIADS[exploreTriad].txt;
+}
+document.querySelectorAll("#triadFilter .chip").forEach(b => b.addEventListener("click", () => {
+  exploreTriad = b.dataset.triad;
+  document.querySelectorAll("#triadFilter .chip").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+  if (exploreTriad !== "all" && !TRIADS[exploreTriad].types.includes(exploreSel)) exploreSel = TRIADS[exploreTriad].types[0];
+  renderExplorer();
+}));
+
+/* ======================= FICHA DE TIPO ======================= */
+function typeDetailHTML(t, ctx){
+  const T = TYPES[t], TR = TRIADS[T.triada];
+  const a = ctx.rec ? analyze(ctx.rec.scores) : null;
+  const role = a ? (t === a.top ? "tu tipo básico" : t === a.wing ? "tu ala" : t === TYPES[a.top].crece ? `tu dirección de integración (leé sus rasgos sanos)` : t === TYPES[a.top].estres ? `tu dirección de desintegración (leé sus rasgos malsanos)` : `${ctx.rec.scores[t]} de 32 puntos`) : "";
+  const ws = wingsOf(t);
+  const acc = (id, title, hint, body, open) => `<details class="acc tinted" data-sec="${id}"${open?" open":""}><summary>${title} <span class="hint">${hint}</span></summary><div class="acc-body">${body}</div></details>`;
+  const sw = ORDER.map(k => `<button style="background:${tVar(k)}" aria-pressed="${k===t}" aria-label="Tipo ${k}: ${TYPES[k].name}" data-k="${k}">${k}</button>`).join("");
+  const target = (x, kind) => `<div class="target">${badge(x)}<div><b>${x}. ${TYPES[x].name}</b><br><span class="muted" style="font-size:.88rem">Rasgos ${kind==="g"?"sanos":"malsanos"} del ${x} que aparecen</span></div></div><p>${esc(kind==="g" ? TYPES[x].sano : TYPES[x].malsano)}</p><button class="linkbtn" data-goto="${x}" data-open="${kind==="g"?"niveles":"niveles"}">Ver ficha completa del ${x}</button>`;
+  return `
+   <div class="type-switch" role="group" aria-label="Elegir tipo">${sw}</div>
+   <div class="td-head"><div class="td-num" aria-hidden="true">${t}</div><div><h3>${T.name}</h3><div class="alias">${esc(T.alias)}${role ? `. <b style="color:var(--ink)">Es ${role}.</b>` : ""}</div><p class="lema" style="margin-bottom:0">“${esc(T.lema)}”</p></div></div>
+   <div class="acc-tools"><button class="btn ghost small" data-acc-all="open">Expandir todo</button><button class="btn ghost small" data-acc-all="close">Contraer todo</button></div>
+   ${acc("perfil","Perfil y tríada","quién es, qué busca y qué teme",`
+     <p><b>${esc(T.rasgos)}</b></p><p>${esc(T.intro)}</p>
+     <dl class="kv"><dt>Tríada</dt><dd>${TR.name} (${TR.alt})</dd><dt>Posición</dt><dd>${esc(T.triadaPos)}</dd><dt>Deseo básico</dt><dd>${esc(T.deseo)}</dd><dt>Miedo básico</dt><dd>${esc(T.miedo)}</dd></dl>
+     <p class="muted" style="font-size:.95rem">${esc(TR.txt)}</p>`, true)}
+   ${acc("niveles","Niveles: sano, promedio y malsano","cómo se ve en su mejor y en su peor momento",`
+     <div class="lvl3"><div class="s"><b>Sano</b>${esc(T.sano)}</div><div class="m"><b>Promedio</b>${esc(T.promedio)}</div><div class="u"><b>Malsano</b>${esc(T.malsano)}</div></div>
+     <h4>Los nueve niveles de desarrollo</h4>
+     <div class="ladder3">${["Sano","Promedio","Malsano"].map((z,g)=>`<div><b>${z}</b><ol class="ladder" start="${g*3+1}">${T.niveles.slice(g*3,g*3+3).map((n,i)=>`<li><span>${g*3+i+1}</span>${esc(n)}</li>`).join("")}</ol></div>`).join("")}</div>`)}
+   ${acc("comunicacion","Estilo de comunicación","palabras, gestos, espacio, tiempo y vestido",`
+     <div class="comgrid"><div><b>Comunicación verbal</b>${esc(T.com.verbal)}</div><div><b>Gestualidad</b>${esc(T.com.gestos)}</div><div><b>Uso del espacio</b>${esc(T.com.espacio)}</div><div><b>Relación con el tiempo</b>${esc(T.com.tiempo)}</div><div><b>Vestido</b>${esc(T.com.vestido)}</div></div>`)}
+   ${acc("virtud",`Virtud: ${esc(T.virtud.nombre.toLowerCase())}`,"su camino de crecimiento",`
+     <p>El itinerario de crecimiento del ${t} consiste en cultivar <b>${esc(T.virtud.nombre.toLowerCase())}</b> con actitudes como estas:</p>
+     <ul>${T.virtud.practicas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`)}
+   ${acc("vicio",`Vicio: ${esc(T.vicio.nombre.toLowerCase())}`,"su pecado capital y cómo se manifiesta",`
+     <p>${esc(T.vicio.desc)}</p><h4>Formas en que se manifiesta</h4>
+     <div class="manif">${T.vicio.manif.map(([h,d])=>`<div><b>${esc(h)}</b>${esc(d)}</div>`).join("")}</div>`)}
+   ${acc("pasion",`Pasión capital: ${esc(T.pasion.nombre.toLowerCase())}`,"según Claudio Naranjo y Alfonso Colodrón",`
+     <p class="muted" style="font-size:.93rem">Información adicional para reconocer tu tipo; habla sobre todo de los niveles promedio y malsano.</p>
+     <p>${esc(T.pasion.texto)}</p><h4>El camino de salida</h4><p>${esc(T.pasion.camino)}</p>`)}
+   ${acc("integracion","Integración y desintegración",`hacia el ${T.crece} cuando crece, hacia el ${T.estres} con estrés`,`
+     <div class="dir2">
+      <div class="dircard g"><h4>Integración: el ${t} va al ${T.crece}</h4><p>${esc(T.crecTxt)}</p>${target(T.crece,"g")}</div>
+      <div class="dircard r"><h4>Desintegración: el ${t} va al ${T.estres}</h4><p>${esc(T.estrTxt)}</p>${target(T.estres,"r")}</div>
+     </div>`)}
+   ${acc("ala","Las alas",`ala ${ws[0]} o ala ${ws[1]}`,`
+     <p>El ${t} siempre tiene algo de uno de sus dos vecinos. Leé ambos y fijate cuál te describe mejor.</p>
+     <div class="wings">${ws.map(w=>`<div class="${a && t===a.top && w===a.wing ? "yours":""}"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">${badge(w)}<b>${t} con ala ${w}</b>${a && t===a.top && w===a.wing ? '<span class="muted" style="font-size:.85rem">(tu ala)</span>':""}</div>${esc(T.alas[w])}<br><button class="linkbtn" data-goto="${w}" data-open="perfil" style="margin-top:6px">Ver el tipo ${w}</button></div>`).join("")}</div>`)}
+   ${acc("vida","En el trabajo y en la familia","con ejemplos de nuestra realidad",`<h4 style="margin-top:0">En el trabajo</h4><p>${esc(T.trabajo)}</p><h4>En la familia y con los amigos</h4><p>${esc(T.familia)}</p>`)}
+   ${acc("recs","Diez recomendaciones","para tu crecimiento personal",`<ol class="recs">${T.recs.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`)}`;
+}
+function mountTypeDetail(container, t, ctx){
+  container.style.setProperty("--tc", tVar(t));
+  container.innerHTML = typeDetailHTML(t, ctx);
+  container.querySelectorAll(".type-switch button").forEach(b => b.addEventListener("click", () => ctx.onSwitch(+b.dataset.k)));
+  container.querySelectorAll("[data-goto]").forEach(b => b.addEventListener("click", () => { ctx.onSwitch(+b.dataset.goto, b.dataset.open); }));
+  bindAccTools(container);
+}
+function openSection(container, sec){
+  if (!sec) return;
+  const d = container.querySelector(`details[data-sec="${sec}"]`);
+  if (d){ d.open = true; setTimeout(() => d.scrollIntoView({behavior:"smooth", block:"start"}), 30); }
+}
+function bindAccTools(scope){
+  scope.querySelectorAll("[data-acc-all]").forEach(b => b.addEventListener("click", () => {
+    const target = b.dataset.accScope ? document.querySelector(b.dataset.accScope) : scope;
+    target.querySelectorAll("details.acc").forEach(d => d.open = b.dataset.accAll === "open");
+  }));
+}
+function renderLibrary(sec){
+  const c = $("#libraryDetail");
+  mountTypeDetail(c, libType, {onSwitch:(k, s) => { libType = k; renderLibrary(s); if (!s) c.scrollIntoView({behavior:"smooth", block:"start"}); }});
+  openSection(c, sec);
+}
+
+/* ======================= VISTAS ======================= */
+function show(id){ document.querySelectorAll(".view").forEach(v => v.classList.toggle("on", v.id === id)); window.scrollTo(0,0); }
+
+/* ======================= TEST ======================= */
+function buildProgress(){
+  const p = $("#progress"); p.innerHTML = "";
+  for (let i = 1; i <= 9; i++){ const seg = document.createElement("i"); const b = document.createElement("b"); b.style.background = `var(--t${i})`; seg.appendChild(b); p.appendChild(seg); }
+}
+function answeredCount(){ return state.answers.filter(a => a !== null).length; }
+function renderQuestion(){
+  const i = state.idx;
+  $("#counter").innerHTML = `Pregunta ${i+1} <span>de 144</span>`;
+  $("#qTitle").textContent = ["Elegí la que más se parece a vos","¿Cuál va más con vos?","¿Con cuál te identificás más?"][i % 3];
+  $("#optA .txt").textContent = Q[i][0];
+  $("#optB .txt").textContent = Q[i][1];
+  ["optA","optB"].forEach((id,k) => { $("#"+id).classList.toggle("chosen", state.answers[i] === k); $("#"+id).setAttribute("aria-pressed", state.answers[i] === k ? "true":"false"); });
+  $("#backBtn").disabled = i === 0;
+  const done = answeredCount();
+  document.querySelectorAll("#progress i b").forEach((b, k) => { b.style.width = (Math.max(0, Math.min(16, done - k*16))/16*100) + "%"; });
+  $("#finishBtn").style.display = done === 144 ? "inline-flex" : "none";
+}
+let advancing = false;
+function choose(opt){
+  if (advancing) return;
+  const i = state.idx, first = state.answers[i] === null;
+  state.answers[i] = opt; store.set(LS_PROGRESS, state); renderQuestion();
+  advancing = true;
+  setTimeout(() => {
+    advancing = false;
+    const done = answeredCount();
+    if (first && MILESTONES[done]) toast(MILESTONES[done]);
+    if (done === 144 && i === 143){ finishTest(); return; }
+    let n = i < 143 ? i + 1 : i;
+    if (state.answers[n] !== null){ const nx = state.answers.indexOf(null); if (nx !== -1) n = nx; }
+    state.idx = n; store.set(LS_PROGRESS, state); renderQuestion();
+  }, 230);
+}
+$("#optA").addEventListener("click", () => choose(0));
+$("#optB").addEventListener("click", () => choose(1));
+$("#backBtn").addEventListener("click", () => { if (state.idx > 0){ state.idx--; store.set(LS_PROGRESS, state); renderQuestion(); } });
+$("#finishBtn").addEventListener("click", finishTest);
+$("#pauseBtn").addEventListener("click", () => { store.set(LS_PROGRESS, state); goHome(); toast("Tu avance quedó guardado. Volvé cuando quieras."); });
+document.addEventListener("keydown", e => {
+  if (!$("#view-test").classList.contains("on") || e.target.tagName === "INPUT" || e.target.tagName === "SUMMARY") return;
+  if (e.key === "1" || e.key === "ArrowLeft"){ e.preventDefault(); choose(0); }
+  else if (e.key === "2" || e.key === "ArrowRight"){ e.preventDefault(); choose(1); }
+  else if (e.key === "Backspace"){ e.preventDefault(); $("#backBtn").click(); }
+});
+function startTest(fresh){
+  if (fresh) state = { name: $("#nameInput").value.trim(), answers:new Array(144).fill(null), idx:0 };
+  else { const nm = $("#nameInput").value.trim(); if (nm) state.name = nm; }
+  store.set(LS_PROGRESS, state); buildProgress(); show("view-test"); renderQuestion(); $("#qTitle").focus({preventScroll:true});
+}
+$("#startBtn").addEventListener("click", () => {
+  const saved = store.get(LS_PROGRESS, null);
+  if (saved && saved.answers && saved.answers.some(a => a !== null) && saved.answers.some(a => a === null)){
+    if (!confirm("Ya tenés un test a medias. ¿Querés empezar uno nuevo desde cero? (El anterior se perderá)")) { state = saved; startTest(false); return; }
+  }
+  startTest(true);
+});
+$("#resumeBtn").addEventListener("click", () => { const s = store.get(LS_PROGRESS, null); if (s) { state = s; startTest(false); } });
+
+/* ======================= PUNTUACIÓN ======================= */
+function score(answers){ const s = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0}; answers.forEach((a, i) => { if (a !== null) s[KEY[i][a]]++; }); return s; }
+function analyze(scores){
+  const rank = ORDER.slice().sort((a,b) => scores[b]-scores[a] || a-b);
+  const top = rank[0], [L,Rr] = wingsOf(top);
+  const wing = scores[L] >= scores[Rr] ? L : Rr;
+  const tri = {}; for (const k in TRIADS) tri[k] = TRIADS[k].types.reduce((s,t)=>s+scores[t],0);
+  return {rank, top, wing, tri, tie: rank.filter(t => scores[t] === scores[top])};
+}
+function finishTest(){
+  const scores = score(state.answers), a = analyze(scores);
+  const rec = { id: Date.now().toString(36), name: state.name || "", date: new Date().toISOString(), scores, top:a.top, wing:a.wing };
+  const hist = store.get(LS_HISTORY, []); hist.unshift(rec); store.set(LS_HISTORY, hist.slice(0, 30));
+  store.del(LS_PROGRESS);
+  state = { name: state.name, answers:new Array(144).fill(null), idx:0 };
+  showResult(rec);
+}
+
+/* ======================= RESULTADO ======================= */
+function fmtDate(iso){ try{ return new Date(iso).toLocaleDateString("es-PY", {day:"numeric", month:"long", year:"numeric"}); }catch(e){ return iso.slice(0,10); } }
+function showResult(rec){
+  current = rec;
+  const a = analyze(rec.scores), T = TYPES[a.top];
+  detType = a.top;
+  const hero = $("#resHero"); hero.style.setProperty("--tc", tVar(a.top));
+  const tieTxt = a.tie.length > 1 ? `<span class="pill">Empate con el <b>${a.tie.filter(t=>t!==a.top).join(" y ")}</b>: leé ambos</span>` : "";
+  hero.innerHTML = `
+    <div class="res-num" aria-hidden="true">${a.top}</div>
+    <div>
+      <p class="who">${rec.name ? esc(rec.name) + ", tu" : "Tu"} tipo básico de personalidad es</p>
+      <h1>${a.top}. ${T.name}</h1>
+      <p class="lema">“${esc(T.lema)}”</p>
+      <div class="res-meta">
+        <span class="pill">Ala <b>${a.wing}</b></span>
+        <span class="pill">${TRIADS[T.triada].name}</span>
+        <span class="pill">Pecado capital: <b>${esc(T.pasion.nombre.toLowerCase())}</b></span>
+        <span class="pill">Virtud: <b>${esc(T.virtud.nombre.toLowerCase())}</b></span>
+        ${tieTxt}
+      </div>
+      <p class="muted" style="margin-top:.8em;font-size:.92rem">Resultado del ${fmtDate(rec.date)}</p>
+    </div>`;
+  const cards = [
+    ["Tipo básico", a.top, "Leé toda la ficha", "perfil"],
+    ["Tu ala", a.wing, "Leé sus características: también son parte de vos", "perfil"],
+    ["Integración", T.crece, "Leé sus rasgos sanos: hacia ahí crecés", "niveles"],
+    ["Desintegración", T.estres, "Leé sus rasgos malsanos: cuidado, hacia ahí vas con estrés", "niveles"]
+  ];
+  $("#pathCards").innerHTML = cards.map(([l,t,w,s]) => `<button data-t="${t}" data-s="${s}"><span class="lbl">${l}</span><span class="ttl">${badge(t)} ${TYPES[t].name}</span><span class="what">${w}</span></button>`).join("");
+  $("#pathCards").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { detType = +b.dataset.t; renderDetail(b.dataset.s); }));
+  fillCompare(); renderResultChart(); renderBars(); renderTriads(); renderDetail(); renderHistory();
+  show("view-result");
+}
+function renderDetail(sec){
+  const c = $("#detailCard");
+  mountTypeDetail(c, detType, {rec: current, onSwitch:(k,s) => { detType = k; renderDetail(s || "perfil"); renderBars(); }});
+  if (sec) { openSection(c, sec); if (sec === "perfil") c.scrollIntoView({behavior:"smooth", block:"start"}); }
+}
+function fillCompare(){
+  const sel = $("#cmpSelect"), hist = store.get(LS_HISTORY, []).filter(h => h.id !== current.id);
+  sel.innerHTML = `<option value="">Ninguno</option>` + hist.map(h => `<option value="${h.id}">${esc(h.name || "Sin nombre")}, ${fmtDate(h.date)} (tipo ${h.top})</option>`).join("");
+  sel.disabled = hist.length === 0;
+}
+function renderResultChart(){
+  const a = analyze(current.scores), cmpId = $("#cmpSelect").value;
+  const cmp = cmpId ? store.get(LS_HISTORY, []).find(h => h.id === cmpId) : null;
+  drawNanduti($("#resultSvg"), {scores: current.scores, top:a.top, arrows: showArrows ? a.top : null, compare: cmp ? cmp.scores : null});
+  const T = TYPES[a.top]; let lg = "";
+  if (showArrows) lg += `<span class="lg-grow">Integración: hacia el ${T.crece}</span><span class="lg-stress">Desintegración: hacia el ${T.estres}</span>`;
+  if (cmp) lg += `<span class="lg-cmp" style="color:var(--muted)">Versión del ${fmtDate(cmp.date)}</span>`;
+  $("#legend").innerHTML = lg;
+}
+$("#tgArrows").addEventListener("click", e => { showArrows = !showArrows; e.currentTarget.setAttribute("aria-pressed", showArrows); renderResultChart(); });
+$("#cmpSelect").addEventListener("change", renderResultChart);
+function renderBars(){
+  const a = analyze(current.scores), box = $("#bars"); box.innerHTML = "";
+  a.rank.forEach(t => {
+    const b = document.createElement("button");
+    b.className = "bar"; b.setAttribute("aria-label", `Tipo ${t}, ${TYPES[t].name}: ${current.scores[t]} de 32. Ver ficha`);
+    b.innerHTML = `<span class="bn" style="background:${tVar(t)}">${t}</span><span class="track" style="${t===detType?"box-shadow:inset 0 0 0 2px var(--ink)":""}"><span class="fill" style="width:0;background:${tVar(t)};opacity:.35"></span><span class="nm">${TYPES[t].name}</span></span><span class="sc">${current.scores[t]}</span>`;
+    b.addEventListener("click", () => { detType = t; renderDetail("perfil"); renderBars(); });
+    box.appendChild(b);
+    requestAnimationFrame(() => requestAnimationFrame(() => { b.querySelector(".fill").style.width = (current.scores[t]/32*100) + "%"; }));
+  });
+}
+function renderTriads(){
+  const a = analyze(current.scores), max = Math.max(...Object.values(a.tri));
+  $("#triads").innerHTML = Object.keys(TRIADS).map(k => {
+    const v = a.tri[k];
+    return `<div class="triad"><div class="row">${TRIADS[k].name} (${TRIADS[k].types.join(", ")}) <span>${v} puntos, ${Math.round(v/144*100)}%</span></div>
+      <div class="track"><b style="width:${v/max*100}%;${v===max?"":"opacity:.45"}"></b></div>${v===max ? `<p>${TRIADS[k].txt}</p>` : ""}</div>`;
+  }).join("");
+}
+
+/* ======================= HISTORIAL ======================= */
+function historyHTML(hist){
+  if (!hist.length) return `<p class="empty">Todavía no hay resultados. Cuando termines el test, aparecen acá.</p>`;
+  return hist.map(h => `<div class="hist-item"><span class="hist-badge" style="background:${tVar(h.top)}">${h.top}</span>
+      <div class="hist-meta"><strong>${esc(h.name || "Sin nombre")}: ${TYPES[h.top].name}, ala ${h.wing}</strong><span>${fmtDate(h.date)}</span></div>
+      <div class="hist-actions"><button class="btn ghost small" data-act="ver" data-id="${h.id}">Ver</button><button class="btn ghost small" data-act="pdf" data-id="${h.id}">PDF</button><button class="btn ghost small" data-act="del" data-id="${h.id}" aria-label="Borrar resultado">Borrar</button></div></div>`).join("");
+}
+function renderHistory(){
+  const hist = store.get(LS_HISTORY, []);
+  ["#homeHistory","#resHistory"].forEach(sel => {
+    const box = $(sel); box.innerHTML = historyHTML(hist);
+    box.querySelectorAll("button[data-act]").forEach(b => b.addEventListener("click", () => {
+      const all = store.get(LS_HISTORY, []), h = all.find(x => x.id === b.dataset.id); if (!h) return;
+      if (b.dataset.act === "ver") showResult(h);
+      else if (b.dataset.act === "pdf") exportPDF(h);
+      else if (confirm("¿Borrar este resultado de forma permanente?")){
+        store.set(LS_HISTORY, all.filter(x => x.id !== h.id));
+        if (current && current.id === h.id && $("#view-result").classList.contains("on")) { goHome(); return; }
+        renderHistory();
+      }
+    }));
+  });
+  if (current && $("#view-result").classList.contains("on")) fillCompare();
+}
+
+/* ======================= PDF ======================= */
+const PDF_COLORS = {1:"#C2313D",2:"#D94C7B",3:"#E07A1F",4:"#7447BD",5:"#2763A8",6:"#13817F",7:"#C99A06",8:"#9C3F24",9:"#2E8540"};
+function hexToRgb(h){ h = h.replace("#",""); const n = parseInt(h,16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function buildPDF(rec, jsPDFCtor){
+  const doc = new jsPDFCtor({unit:"mm", format:"a4"});
+  const W = 210, H = 297, M = 16, CW = W - 2*M, BOTTOM = H - 24;
+  const a = analyze(rec.scores), T = TYPES[a.top];
+  const ink = [24,33,47], muted = [86,97,118], line = [214,221,231], green = [30,122,79], red = [180,35,58];
+  const tc = hexToRgb(PDF_COLORS[a.top]);
+  const setC = c => doc.setTextColor(c[0],c[1],c[2]);
+  let page = 1, y = 0;
+  const footer = () => {
+    doc.setDrawColor(...line); doc.setLineWidth(.3); doc.line(M, H-18, W-M, H-18);
+    doc.setFont("helvetica","normal"); doc.setFontSize(7.5); setC(muted);
+    doc.text(`Herramienta: ${AUTHOR}, Asunción, Paraguay. Basada en Don Richard Riso y Russ Hudson (RHETI), Óscar Ichazo y Claudio Naranjo.`, M, H-13);
+    doc.text("Orientativo: no es un diagnóstico psicológico.", M, H-9.5);
+    doc.text(`Página ${page}`, W-M, H-9.5, {align:"right"});
+  };
+  const newPage = () => { footer(); doc.addPage(); page++; doc.setFillColor(...tc); doc.rect(0,0,W,6,"F"); y = 18; };
+  const need = h => { if (y + h > BOTTOM) newPage(); };
+  const para = (txt, opts) => {
+    opts = opts || {}; const size = opts.size || 9.8, lh = size*0.48, w = opts.w || CW, x = opts.x || M;
+    doc.setFont("helvetica", opts.style || "normal"); doc.setFontSize(size); setC(opts.color || ink);
+    const lines = doc.splitTextToSize(txt, w);
+    lines.forEach(l => { need(lh); doc.text(l, x, y); y += lh; });
+    y += opts.after == null ? 2 : opts.after;
+  };
+  const h2 = (txt, col) => { need(16); y += 3; doc.setFont("helvetica","bold"); doc.setFontSize(13); setC(col || tc); doc.text(txt, M, y); y += 2; doc.setDrawColor(...(col||tc)); doc.setLineWidth(.5); doc.line(M, y, M+CW, y); y += 5.5; };
+  const h3 = (txt, col) => { need(10); doc.setFont("helvetica","bold"); doc.setFontSize(10.5); setC(col || ink); doc.text(txt, M, y); y += 5; };
+  const bullets = (items, numbered) => items.forEach((it,i) => {
+    doc.setFont("helvetica","normal"); doc.setFontSize(9.6); const ls = doc.splitTextToSize(it, CW-7);
+    need(ls.length*4.6 + 1); setC(numbered ? tc : ink); doc.setFont("helvetica", numbered ? "bold":"normal"); doc.text(numbered ? `${i+1}.` : "•", M, y);
+    setC(ink); doc.setFont("helvetica","normal"); doc.text(ls, M+7, y); y += ls.length*4.6 + 1.2;
+  });
+  const kv = (k, v) => { doc.setFont("helvetica","normal"); doc.setFontSize(9.8); const ls = doc.splitTextToSize(v, CW-38); need(ls.length*4.7); setC(muted); doc.text(k, M, y); setC(ink); doc.setFont("helvetica","bold"); doc.text(ls, M+38, y); y += ls.length*4.7 + 1; };
+
+  // ---- Página 1: resumen ----
+  doc.setFillColor(...tc); doc.rect(0, 0, W, 8, "F");
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); setC(muted); doc.text("Eneagrama: informe de personalidad", M, 20);
+  doc.setFont("helvetica","normal"); doc.text(fmtDate(rec.date), W-M, 20, {align:"right"});
+  doc.setFont("helvetica","bold"); doc.setFontSize(96); setC(tc); doc.text(String(a.top), M-2, 58);
+  const tx = M + 34;
+  doc.setFont("helvetica","normal"); doc.setFontSize(11); setC(muted); doc.text((rec.name ? rec.name + ", tu" : "Tu") + " tipo básico de personalidad es", tx, 33);
+  doc.setFont("helvetica","bold"); doc.setFontSize(26); setC(ink); doc.text(T.name, tx, 45);
+  doc.setFont("helvetica","italic"); doc.setFontSize(12.5); doc.text("“" + T.lema + "”", tx, 54);
+  const chips = [`Ala ${a.wing}`, TRIADS[T.triada].name, `Integración: ${T.crece}`, `Desintegración: ${T.estres}`];
+  let cx = M, cy = 66; doc.setFontSize(9); doc.setFont("helvetica","bold");
+  chips.forEach(c => { const w = doc.getTextWidth(c) + 8; doc.setDrawColor(...line); doc.setFillColor(245,247,250); doc.roundedRect(cx, cy-5, w, 7.5, 3.5, 3.5, "FD"); setC(ink); doc.text(c, cx+4, cy); cx += w + 3; });
+  // eneagrama
+  const ox = 58, oy = 126, rr = 38;
+  const P = (t, r) => { const ang = (-90 + (t%9)*40) * Math.PI/180; return [ox + r*Math.cos(ang), oy + r*Math.sin(ang)]; };
+  doc.setDrawColor(...line); doc.setLineWidth(.25);
+  for (let r = 10; r <= 46; r += 9) doc.circle(ox, oy, r, "S");
+  for (let i = 0; i < 36; i++){ const ang = i*10*Math.PI/180; doc.line(ox+4*Math.cos(ang), oy+4*Math.sin(ang), ox+46*Math.cos(ang), oy+46*Math.sin(ang)); }
+  doc.setDrawColor(...muted); doc.setLineWidth(.45); doc.circle(ox, oy, rr, "S");
+  const poly = arr => { for (let i = 0; i < arr.length; i++){ const p1 = P(arr[i], rr), p2 = P(arr[(i+1)%arr.length], rr); doc.line(p1[0],p1[1],p2[0],p2[1]); } };
+  poly([3,6,9]); poly([1,4,2,8,5,7]);
+  const sp = ORDER.map(t => P(t, 5 + (rr-5)*rec.scores[t]/32));
+  const segs = sp.slice(1).map((p,i) => [p[0]-sp[i][0], p[1]-sp[i][1]]);
+  try { doc.setGState(new doc.GState({opacity:.25})); } catch(e){}
+  doc.setFillColor(...tc); doc.lines(segs, sp[0][0], sp[0][1], [1,1], "F", true);
+  try { doc.setGState(new doc.GState({opacity:1})); } catch(e){}
+  doc.setDrawColor(...tc); doc.setLineWidth(.8); doc.lines(segs, sp[0][0], sp[0][1], [1,1], "S", true);
+  const arrow = (from, to, col) => {
+    const [x1,y1] = P(from, rr), [x2,y2] = P(to, rr); const dx = x2-x1, dy = y2-y1, L = Math.hypot(dx,dy);
+    const sx = x1+dx*6/L, sy = y1+dy*6/L, ex = x2-dx*7/L, ey = y2-dy*7/L;
+    doc.setDrawColor(...col); doc.setFillColor(...col); doc.setLineWidth(.9); doc.line(sx,sy,ex,ey);
+    const ang = Math.atan2(ey-sy, ex-sx), s = 2.4;
+    doc.triangle(ex, ey, ex - s*Math.cos(ang-0.45), ey - s*Math.sin(ang-0.45), ex - s*Math.cos(ang+0.45), ey - s*Math.sin(ang+0.45), "F");
+  };
+  arrow(a.top, T.crece, green); arrow(a.top, T.estres, red);
+  for (const t of ORDER){
+    const [x,yy] = P(t, rr); const c = hexToRgb(PDF_COLORS[t]);
+    doc.setFillColor(...c); doc.setDrawColor(255,255,255); doc.setLineWidth(.8); doc.circle(x, yy, 4.6, "FD");
+    doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text(String(t), x, yy+1.2, {align:"center"});
+    const [lx,ly] = P(t, rr+10); setC(ink); doc.text(String(rec.scores[t]), lx, ly+1.2, {align:"center"});
+  }
+  doc.setFont("helvetica","normal"); doc.setFontSize(8); setC(green); doc.text("Verde: integración", ox-34, oy+56); setC(red); doc.text("Rojo: desintegración", ox+4, oy+56);
+  // barras
+  const bx = 112, bw = W - M - bx; let by = 88;
+  doc.setFont("helvetica","bold"); doc.setFontSize(12); setC(ink); doc.text("Puntaje por tipo (máximo 32)", bx, by-6);
+  a.rank.forEach(t => {
+    const c = hexToRgb(PDF_COLORS[t]);
+    doc.setFillColor(...c); doc.circle(bx+3, by+2.2, 3, "F");
+    doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(255,255,255); doc.text(String(t), bx+3, by+3.1, {align:"center"});
+    doc.setFillColor(237,241,246); doc.roundedRect(bx+8, by-1, bw-18, 6.4, 1.5, 1.5, "F");
+    doc.setFillColor(...c); doc.roundedRect(bx+8, by-1, Math.max(1.5,(bw-18)*rec.scores[t]/32), 6.4, 1.5, 1.5, "F");
+    doc.setFont("helvetica","bold"); doc.setFontSize(9); setC(ink); doc.text(String(rec.scores[t]), W-M, by+3.6, {align:"right"});
+    doc.setFont("helvetica","normal"); doc.setFontSize(8); setC(muted); doc.text(TYPES[t].name, bx+8, by+9.2);
+    by += 12.6;
+  });
+  // tríadas
+  y = 198;
+  doc.setFont("helvetica","bold"); doc.setFontSize(12); setC(ink); doc.text("Tus tríadas", M, y); y += 7;
+  const maxT = Math.max(...Object.values(a.tri));
+  Object.keys(TRIADS).forEach(k => {
+    const v = a.tri[k];
+    doc.setFont("helvetica","bold"); doc.setFontSize(9.5); setC(ink); doc.text(`${TRIADS[k].name} (${TRIADS[k].types.join(", ")})`, M, y);
+    doc.setFont("helvetica","normal"); setC(muted); doc.text(`${v} puntos (${Math.round(v/144*100)}%)`, M+66, y);
+    doc.setFillColor(237,241,246); doc.roundedRect(M+104, y-3.2, CW-104, 3.6, 1.8, 1.8, "F");
+    doc.setFillColor(...(v===maxT ? ink : [160,170,185])); doc.roundedRect(M+104, y-3.2, (CW-104)*v/maxT, 3.6, 1.8, 1.8, "F");
+    y += 7.5;
+  });
+  y += 1;
+  para(`Tu recorrido de lectura: tu tipo básico (${a.top}), tu ala (${a.wing}), los rasgos sanos de tu integración (${T.crece}) y los rasgos malsanos de tu desintegración (${T.estres}). Nadie es un tipo puro: tu personalidad es una mezcla de estos cuatro. El test orienta; la confirmación llega al observarte con honestidad.`, {color:muted, size:9.4});
+  newPage();
+
+  // ---- Ficha ----
+  doc.setFont("helvetica","bold"); doc.setFontSize(20); setC(ink); doc.text(`Tipo ${a.top}: ${T.name}`, M, y); y += 6;
+  para(T.alias + ". " + T.rasgos, {color:muted, size:10});
+  h2("Perfil y tríada");
+  para(T.intro);
+  kv("Tríada", `${TRIADS[T.triada].name} (${T.triadaPos.toLowerCase()})`); kv("Deseo básico", T.deseo); kv("Miedo básico", T.miedo); y += 2;
+  h2("Niveles de desarrollo");
+  h3("Sano", green); para(T.sano); h3("Promedio"); para(T.promedio); h3("Malsano", red); para(T.malsano);
+  para("Escala de nueve niveles: " + T.niveles.map((n,i)=>`${i+1}. ${n}`).join("; ") + ".", {color:muted, size:9});
+  h2("Estilo de comunicación");
+  [["Comunicación verbal",T.com.verbal],["Gestualidad",T.com.gestos],["Uso del espacio",T.com.espacio],["Relación con el tiempo",T.com.tiempo],["Vestido",T.com.vestido]].forEach(([k,v]) => { h3(k); para(v); });
+  h2(`Virtud: ${T.virtud.nombre}`, green); bullets(T.virtud.practicas); y += 2;
+  h2(`Vicio o pecado capital: ${T.vicio.nombre}`, red); para(T.vicio.desc);
+  T.vicio.manif.forEach(([k,v]) => { h3(k); para(v); });
+  h2(`Pasión capital según Naranjo: ${T.pasion.nombre}`); para(T.pasion.texto); h3("El camino de salida"); para(T.pasion.camino);
+  h2(`Integración: el ${a.top} va al ${T.crece} (${TYPES[T.crece].name})`, green); para(T.crecTxt);
+  h3(`Rasgos sanos del ${T.crece} que incorporás`, green); para(TYPES[T.crece].sano);
+  h2(`Desintegración: el ${a.top} va al ${T.estres} (${TYPES[T.estres].name})`, red); para(T.estrTxt);
+  h3(`Rasgos malsanos del ${T.estres} que aparecen`, red); para(TYPES[T.estres].malsano);
+  h2(`Tu ala: ${a.wing}, ${TYPES[a.wing].name}`); para(T.alas[a.wing]);
+  h3(`Rasgos del ${a.wing} que también son parte de vos`); para(TYPES[a.wing].rasgos + " " + TYPES[a.wing].sano);
+  h2("En el trabajo y en la familia"); h3("En el trabajo"); para(T.trabajo); h3("En la familia y con los amigos"); para(T.familia);
+  h2("Diez recomendaciones para tu crecimiento"); bullets(T.recs, true);
+  y += 4; para("La personalidad es como un traje psicológico, mental y emocional. Tomá conciencia de él: tenés el poder de transformarlo en su expresión más hermosa.", {style:"italic", color:muted});
+  footer();
+  return doc;
+}
+let downloadsApi = null;
+(async () => { try { if (window.claude && typeof window.claude.use === "function") downloadsApi = await window.claude.use("downloads"); } catch(e){ downloadsApi = null; } })();
+async function exportPDF(rec){
+  if (!window.jspdf || !window.jspdf.jsPDF){ toast("No se pudo cargar el generador de PDF. Revisá tu conexión e intentá de nuevo."); return; }
+  const doc = buildPDF(rec, window.jspdf.jsPDF);
+  const safe = (rec.name || "resultado").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9]+/g,"-").replace(/^-|-$/g,"").toLowerCase() || "resultado";
+  const filename = `eneagrama-${safe}-${rec.date.slice(0,10)}.pdf`;
+  if (downloadsApi){
+    try { await downloadsApi.save({filename, data: doc.output("blob")}); toast("Informe descargado."); }
+    catch(e){ if (e && e.code === "declined") return; if (e && (e.code === "unavailable" || e.code === "not_granted")) doc.save(filename); else toast("No se pudo guardar el PDF. Intentá de nuevo."); }
+  } else doc.save(filename);
+}
+$("#pdfBtn").addEventListener("click", () => current && exportPDF(current));
+$("#retakeBtn").addEventListener("click", () => { $("#nameInput").value = current ? current.name : ""; startTest(true); });
+
+/* ======================= GENERAL ======================= */
+let toastTimer;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("on"), 3200); }
+function goHome(){
+  const saved = store.get(LS_PROGRESS, null);
+  const n = saved && saved.answers ? saved.answers.filter(a => a !== null).length : 0;
+  $("#resumeNote").classList.toggle("on", n > 0 && n < 144); $("#resumeCount").textContent = n;
+  if (saved && saved.name && !$("#nameInput").value) $("#nameInput").value = saved.name;
+  renderHistory(); show("view-home");
+}
+$("#homeLink").addEventListener("click", goHome);
+$("#toHomeBtn").addEventListener("click", goHome);
+function isDark(){ const th = document.documentElement.getAttribute("data-theme"); return th ? th === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; }
+$("#themeToggle").addEventListener("click", () => {
+  const next = isDark() ? "light" : "dark"; store.set("eneagrama.theme", next);
+  document.documentElement.setAttribute("data-theme", next);
+  $("#themeToggle").textContent = isDark() ? "Modo claro" : "Modo oscuro";
+  drawNanduti($("#heroSvg"), {}); renderExplorer();
+  if (current && $("#view-result").classList.contains("on")) renderResultChart();
+});
+(function init(){
+  const th = store.get("eneagrama.theme", null); if (th) document.documentElement.setAttribute("data-theme", th);
+  $("#themeToggle").textContent = isDark() ? "Modo claro" : "Modo oscuro";
+  $("#learnAcc").innerHTML = learnHTML();
+  bindAccTools(document.querySelector("#aprender"));
+  drawNanduti($("#heroSvg"), {animate:true});
+  renderExplorer(); renderLibrary(); goHome();
+})();
+
+</script>
+</body>
+</html>
